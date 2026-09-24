@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Block A — Everything as matrices</title>
+<link rel="stylesheet" href="style.css">
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'], ['\\(','\\)']], displayMath: [['$$','$$'], ['\\[','\\]']],
+         macros: { E: "\\mathbb{E}", R: "\\mathbb{R}", tr: "\\operatorname{tr}", diag: "\\operatorname{diag}",
+                   ip: ["\\langle #1 \\rangle", 1], K: "\\mathcal{K}", P: "\\mathcal{P}", X: "\\mathcal{X}" } },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+<nav class="top">
+  <a class="brand" href="index.html">Coherent sets · problem set</a>
+  <div class="links"><a href="index.html">Overview</a> <a href="block0.html">0 · Transfer operators</a> <a href="blockA.html" class="active">A · Finite chains</a> <a href="blockB.html">B · Generators</a> <a href="blockC.html">C · Ornstein–Uhlenbeck</a> <a href="blockD.html">D · Data-driven</a></div>
+  <button id="toggle-all" type="button">Show all solutions</button>
+</nav>
+<main>
+<h1>Block A — Everything as matrices</h1>
+<p class="lead">On a finite state space every operator is a matrix, every inner product is a weighted dot product, and the paper's Eqs. (4)–(9) can be computed by hand or in ten lines of NumPy.</p>
+
+<h3 id="p2">Problem 2 — Koopman and Perron–Frobenius on a finite chain</h3>
+<div class="setting"><span class="label">Setting</span>
+$N$ states, transition matrix $P_{ij}=P(X_{t+1}=j\mid X_t=i)$ (rows sum to one). Observables are column vectors $f\in\R^N$ ($f_i$ = value of the observable in state $i$); densities are row vectors $p$ with $\sum_ip_i=1$. Stationary distribution $\pi$ solves $\pi P=\pi$.
+For (b)–(d) use
+$$P=\begin{pmatrix}0.8&0.2&0\\0.1&0.8&0.1\\0&0.2&0.8\end{pmatrix}.$$</div>
+<p class="goal">Goal: see Eq. (4)'s numerator as a matrix computation and settle the direction in which $\K$ acts.</p>
+
+<div class="part"><p><span class="q">(a)</span> Show that the Koopman operator acts on observables as $f\mapsto Pf$ and the Perron–Frobenius operator on densities as $p\mapsto pP$, and verify the duality $p\,(Pf)=(pP)\,f$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$(Pf)_i=\sum_jP_{ij}f_j=\sum_jP(X_{t+1}=j\mid X_t=i)f_j=\E[f(X_{t+1})\mid X_t=i]=(\K f)_i$. $(pP)_j=\sum_ip_iP_{ij}=P(X_{t+1}=j)$ when $X_t\sim p$, so $pP=\P p$. Duality is associativity of matrix multiplication: $p(Pf)=(pP)f=\sum_{ij}p_iP_{ij}f_j=\E[f(X_{t+1})]$. The two operators are the same matrix acting from the right and from the left.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Take $B=\{3\}$. Compute $\K\mathbf 1_B$ entrywise and interpret each entry.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\mathbf 1_B=(0,0,1)^\top$, so $\K\mathbf 1_B=P\mathbf 1_B=$ third column of $P$ $=(0,\,0.1,\,0.8)^\top$. Entry $i$ is $P(X_{t+1}\in B\mid X_t=i)$: the probability that a walker <em>currently</em> in state $i$ will be in $B$ one step later. This is a function on present states built from a set of future states — $\K$ pulls the indicator of $B$ back in time.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Compute $\pi$. With $A=\{1,2\}$, verify that $\ip{\mathbf 1_A,\K\mathbf 1_B}_\pi/\ip{\mathbf 1_A,\mathbf 1_A}_\pi=P(X_{t+1}\in B\mid X_t\in A)$, the numerator of the paper's Eq. (4). Then compute the "wrong-way" quantity $\ip{\mathbf 1_B,\K\mathbf 1_A}_\pi$ and say what it is.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$P$ is tridiagonal (a birth–death chain), so $\pi$ can be read off from the pairwise balance $\pi_iP_{i,i+1}=\pi_{i+1}P_{i+1,i}$: $0.2\pi_1=0.1\pi_2$ and $0.1\pi_2=0.2\pi_3$, giving $\pi\propto(1,2,1)$, i.e. $\pi=(0.25,0.5,0.25)$. (Check: $\pi P=\pi$.)</p>
+<p>$\ip{\mathbf 1_A,\K\mathbf 1_B}_\pi=\sum_{i\in A}\pi_i(P\mathbf 1_B)_i=0.25\cdot0+0.5\cdot0.1=0.05$ and $\ip{\mathbf 1_A,\mathbf 1_A}_\pi=\pi(A)=0.75$. The ratio is $0.05/0.75=1/15$. Directly: $P(X_{t+1}\in B\mid X_t\in A)=\sum_{i\in A}\pi_iP_{i3}/\pi(A)=(0+0.05)/0.75=1/15$. Agreed. In general $\ip{\mathbf 1_A,\K\mathbf 1_B}_\pi=P(X_t\in A,\,X_{t+1}\in B)$, the joint probability, and dividing by $\pi(A)$ conditions on the present set.</p>
+<p>Wrong way: $\ip{\mathbf 1_B,\K\mathbf 1_A}_\pi=\pi_3(P\mathbf 1_A)_3=0.25\cdot(0+0.2)=0.05=P(X_t\in B,\,X_{t+1}\in A)$ — the joint probability of the <em>reverse</em> transition, $B$ now and $A$ next. It happens to equal the forward joint here because this chain is reversible (Problem 3d); the conditional probabilities differ: $0.05/\pi(B)=0.2\ne1/15$. For an irreversible chain even the joints differ.</p>
+</details></div>
+
+<h3 id="p3">Problem 3 — The weighted adjoint is the reversed chain</h3>
+<div class="setting"><span class="label">Setting</span>
+Inner product $\ip{f,g}_\pi=\sum_i\pi_if_ig_i$ on observables, with $\pi$ stationary.</div>
+<p class="goal">Goal: derive the paper's Eq. (16) in matrix form and see reversibility as the condition $P^\dagger=P$.</p>
+
+<div class="part"><p><span class="q">(a)</span> From the defining relation $\ip{f,Pg}_\pi=\ip{P^\dagger f,g}_\pi$, derive $P^\dagger=\diag(\pi)^{-1}P^\top\diag(\pi)$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\ip{f,Pg}_\pi=\sum_i\pi_if_i\sum_jP_{ij}g_j=\sum_jg_j\Big[\sum_i\pi_iP_{ij}f_i\Big]=\sum_j\pi_jg_j\Big[\pi_j^{-1}\sum_i\pi_iP_{ij}f_i\Big]$. Comparing with $\ip{P^\dagger f,g}_\pi=\sum_j\pi_j(P^\dagger f)_jg_j$ gives $(P^\dagger f)_j=\pi_j^{-1}\sum_iP_{ij}\pi_if_i$, i.e.
+$$P^\dagger_{ji}=\frac{\pi_iP_{ij}}{\pi_j},\qquad P^\dagger=\diag(\pi)^{-1}P^\top\diag(\pi).$$
+With $\pi\to\rho_0$ and $P^\top\to$ the Perron–Frobenius operator $e^{L\tau}$ (matrices act on row vectors from the right, so $P^\top$ acting on column vectors is $\P$), this is exactly the paper's Eq. (16).</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Show $P^\dagger_{ji}=P(X_t=i\mid X_{t+1}=j)$, so that $P^\dagger$ is the Koopman matrix of the time-reversed chain.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Bayes' rule with the stationary marginals: $P(X_t=i\mid X_{t+1}=j)=\dfrac{P(X_{t+1}=j\mid X_t=i)P(X_t=i)}{P(X_{t+1}=j)}=\dfrac{P_{ij}\pi_i}{\pi_j}=P^\dagger_{ji}$. Hence $(P^\dagger f)_j=\sum_iP(X_t=i\mid X_{t+1}=j)f_i=\E[f(X_t)\mid X_{t+1}=j]$: $P^\dagger$ conditions <em>backward</em> on the future exactly as $P$ conditions forward on the past. The reversed chain $\tilde X_s=X_{-s}$ is Markov with transition matrix $P^\dagger$ and the same stationary distribution. Reading Eq. (16) as "weight by the prior, push forward, divide by the marginal" is reading Bayes' rule in operator form.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Show $P^\dagger=P$ iff detailed balance $\pi_iP_{ij}=\pi_jP_{ji}$ holds, and that in that case $\tilde P=\diag(\pi)^{1/2}P\diag(\pi)^{-1/2}$ is symmetric.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$P^\dagger=P\iff\pi_iP_{ij}/\pi_j=P_{ji}$ for all $i,j\iff\pi_iP_{ij}=\pi_jP_{ji}$. Under detailed balance, $\tilde P_{ij}=\pi_i^{1/2}P_{ij}\pi_j^{-1/2}$ and $\tilde P_{ji}=\pi_j^{1/2}P_{ji}\pi_i^{-1/2}=\pi_j^{1/2}\,\dfrac{\pi_iP_{ij}}{\pi_j}\,\pi_i^{-1/2}=\pi_i^{1/2}P_{ij}\pi_j^{-1/2}=\tilde P_{ij}$.</p>
+<p>The map $f\mapsto\diag(\pi)^{1/2}f$ is an isometry from $\ell^2(\pi)$ to plain $\ell^2$, and $\tilde P$ is $P$ transported through it. So "self-adjoint in the $\pi$-weighted inner product" is literally "symmetric after whitening by $\pi^{1/2}$". A reversible chain has real eigenvalues and orthogonal ($\pi$-weighted) eigenvectors; an irreversible one need not, which is why the paper works with singular functions of $\tilde P$ instead of eigenfunctions of $P$.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> Compute $P^\dagger$ for the chain of Problem 2 and decide whether it is reversible.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Every birth–death chain is reversible: the balance relations used to find $\pi$ in Problem 2(c) <em>are</em> detailed balance, and the only nonzero off-diagonal entries are nearest-neighbour. Check one entry: $P^\dagger_{21}=\pi_1P_{12}/\pi_2=0.25\cdot0.2/0.5=0.1=P_{21}$. So $P^\dagger=P$, and the forward- and backward-conditioned expectations coincide. This is why the wrong-way joint in Problem 2(c) came out equal to the right-way one.</p>
+</details></div>
+
+<h3 id="p4">Problem 4 — Coherent sets of a 4-state chain (numeric)</h3>
+<div class="setting"><span class="label">Setting</span>
+Script <code>code/p04_finite_chain.py</code>. The "whitened Koopman matrix" is $\tilde P=\diag(\pi)^{1/2}P\diag(\pi)^{-1/2}$. Its SVD $\tilde P=U\Sigma V^\top$ gives $\tilde P\,V_{:,i}=\sigma_iU_{:,i}$; undoing the whitening, the paper's singular pair is
+$u_i=\diag(\pi)^{-1/2}V_{:,i}$ (future, retrospective) and $v_i=\diag(\pi)^{-1/2}U_{:,i}$ (present, predictive), satisfying $Pu_i=\sigma_iv_i$.</div>
+<p class="goal">Goal: run Eqs. (6)–(9) on a concrete chain, then break reversibility and watch the common-future and common-past partitions come apart.</p>
+
+<div class="part"><p><span class="q">(a)</span> Build the chain with two weakly coupled pairs $\{1,2\}$, $\{3,4\}$,
+$$P=\begin{pmatrix}0.90&0.09&0.01&0\\0.09&0.90&0&0.01\\0.01&0&0.90&0.09\\0&0.01&0.09&0.90\end{pmatrix},$$
+compute $\pi$ and $\tilde P$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$P$ is symmetric and doubly stochastic, so $\pi=(\tfrac14,\tfrac14,\tfrac14,\tfrac14)$ and $\tilde P=P$: whitening is trivial for a uniform stationary distribution. Detailed balance holds trivially ($\pi_iP_{ij}=P_{ij}/4=P_{ji}/4$).</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Compute the SVD of $\tilde P$; identify the trivial pair and the subdominant pair; sign-threshold the subdominant singular vectors.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Output: singular values $(1,\;0.98,\;0.82,\;0.80)$. The value $1$ belongs to the constant vector — the trivial pair $u_0=v_0=\mathbf 1$ of Eq. (7). The subdominant pair has $\sigma_1=0.98$ with
+$$v_1\propto u_1\propto(-1,-1,+1,+1),$$
+so $\operatorname{sign}v_1$ partitions the states into $\{1,2\}$ and $\{3,4\}$: Eq. (9) recovers the two weakly coupled pairs. Note the spectral gap $0.98\to0.82$: one non-trivial coherent pair, then fast-mixing modes within the pairs.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Explain why the left and right subdominant singular vectors coincide here, and relate $\sigma_1$ to the leakage between the pairs. Evaluate the objective of Eq. (4) on $A=B=\{1,2\}$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\tilde P$ is symmetric (reversible chain, Problem 3c), so $\tilde P^\top\tilde P=\tilde P\tilde P^\top=\tilde P^2$ and the SVD is the eigendecomposition: $u_i=v_i$. Predictive and retrospective sets are the same — there is no arrow of time to distinguish "common future" from "common past".</p>
+<p>Leakage: $Pv_1$ in row 1 gives $0.90+0.09-0.01=0.98$, so $\sigma_1=1-2\varepsilon$ with $\varepsilon=0.01$ the per-step probability of leaving one's pair. The objective of Eq. (4) on $A=B=\{1,2\}$ is $P(\text{stay in }\{1,2\})+P(\text{stay in }\{3,4\})=0.99+0.99=1.98=1+\sigma_1$. Problem 5(a) shows this is not a coincidence: the objective equals $1+$ (a normalised bilinear form whose maximum is $\sigma_1$).</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> Now take a directed ring $1\to2\to3\to4\to1$ with unequal probabilities of staying put, $\text{stay}=(0.1,0.3,0.1,0.3)$ and $P_{i,i+1}=1-\text{stay}_i$. Check that detailed balance fails, compute the subdominant pair, and interpret the two sign patterns.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Output: $\pi=(0.219,0.281,0.219,0.281)$, $\max_{ij}|\pi_iP_{ij}-\pi_jP_{ji}|=0.197$ (detailed balance badly violated — the walker only ever moves clockwise), singular values $(1,\;0.919,\;0.719,\;0.60)$, and
+$$v_1\propto(+0.88,\,+1,\,-0.88,\,-1),\qquad u_1\propto(-0.88,\,+1,\,+0.88,\,-1).$$
+Sign patterns: $\operatorname{sign}v_1$ gives $V^\pm=\{1,2\}\mid\{3,4\}$, while $\operatorname{sign}u_1$ gives $U^\pm=\{2,3\}\mid\{4,1\}$. The partitions differ by one step around the ring, which is exactly what a coherent pair should do: mass in $V^+=\{1,2\}$ at time $t$ is (mostly) in $U^+=\{2,3\}$ at time $t+1$, since state 1 moves to 2 and state 2 moves to 3 with high probability. $v_1$ groups present states by common future; $u_1$ groups future states by common past; $U^+$ is the image of $V^+$ under the flow, as stated after Eq. (9).</p>
+<p>The objective of Eq. (4) on the rounded pair $(\{1,2\},\{2,3\})$ is $1.9125$, close to the relaxation bound $1+\sigma_1=1.919$; the same-set pair $(\{1,2\},\{1,2\})$ scores only $1.21$. Predictive and retrospective neurons in the paper's language would here be a unit that fires for present states $\{1,2\}$ and a unit that fires for future states $\{2,3\}$: two different filters for the two halves of one coherent pair.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(e)</span> <em>Rounding is a heuristic.</em> Repeat (d) with $\text{stay}=(0.7,0.9,0.7,0.9)$ (weak flow). Compare the objective of the sign-rounded pair with that of the same-set pair.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Output: $v_1\propto(-0.19,-1,+0.19,+1)$, $u_1\propto(+0.19,-1,-0.19,+1)$. The sign patterns again give $(\{1,2\},\{2,3\})$, but now the entries for states 1 and 3 are small — they sit near the decision boundary. The rounded pair scores $1.65$, the same-set pair $(\{1,2\},\{1,2\})$ scores $1.85$, and the relaxation bound is $1.92$. So sign-thresholding the singular vectors does <em>not</em> always return the best indicator pair; when the flow is weak the singular vectors say "states 2 and 4 are the cores, 1 and 3 are ambiguous", and hard rounding throws that information away. This is the motivation for the paper's soft (ReLU) reading in Section 5.2: the <em>magnitude</em> of the singular function carries membership confidence. <span class="tier">High</span> that rounding is only guaranteed up to Cheeger-type bounds (Froyland 2013, Sec. 4).</p>
+</details></div>
+
+<h3 id="p5">Problem 5 — Relaxation, and the spectral-clustering correspondence</h3>
+<div class="setting"><span class="label">Setting</span>
+General stationary process with Koopman operator $\K$ (write $\K$ for $\K_\tau$), marginals $\mu=\nu=\rho_0$, and the objective of Eq. (4) with the balance constraint $\rho_0(A)=\rho_0(B)=p$.</div>
+<p class="goal">Goal: see exactly in what sense the subdominant singular pair "solves" Eq. (4), and see normalised spectral clustering as the reversible special case.</p>
+
+<div class="part"><p><span class="q">(a)</span> Let $J=\ip{\mathbf 1_A,\K\mathbf 1_B}_{\rho_0}$. Show that the objective of Eq. (4) equals $1+\dfrac{\ip{f,\K g}_{\rho_0}}{\|f\|_{\rho_0}\|g\|_{\rho_0}}$ with the centred indicators $f=\mathbf 1_A-p$, $g=\mathbf 1_B-p$, and hence that its maximum over all $f,g$ orthogonal to the constants is the subdominant singular value $\lambda_1$, attained at $(f,g)=(v_1,u_1)$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Using $\K\mathbf 1=\mathbf 1$, $\ip{\mathbf 1_A,\mathbf 1}=p$ and $\ip{\mathbf 1,\K\mathbf 1_B}=\rho_0(B)=p$ (stationarity):
+$$\ip{f,\K g}=J-p\cdot p-p\cdot p+p^2=J-p^2,\qquad\|f\|^2=\|g\|^2=p-p^2=p(1-p).$$
+For the complements, $\ip{\mathbf 1_{A^c},\K\mathbf 1_{B^c}}=\ip{\mathbf 1-\mathbf 1_A,\K(\mathbf 1-\mathbf 1_B)}=1-2p+J$. So the objective is
+$$\frac{J}{p}+\frac{1-2p+J}{1-p}=1+\frac{J-p^2}{p(1-p)}=1+\frac{\ip{f,\K g}}{\|f\|\,\|g\|}.$$
+The second term is a normalised bilinear form of $\K$ restricted to the orthogonal complement of the constants (both $f$ and $g$ have zero mean). By the variational characterisation of singular values, $\max\ip{f,\K g}/(\|f\|\|g\|)$ over that complement is the largest singular value of $\K$ orthogonal to the trivial pair, namely $\lambda_1$, attained at $f=v_1$, $g=u_1$. Hence the objective is at most $1+\lambda_1$ for any balanced indicator pair, with the singular pair as the relaxed maximiser — the content of the paper's "well-approximated by certain singular functions". (The paper's $\lambda_i^2$ are the eigenvalues of $F_\tau=\K\K^\dagger$; the singular values of $\K$ itself are $\lambda_i$.) Check against Problem 4(c): $1+0.98=1.98$.</p>
+<p>Two remarks. The constraint $\rho_0(A)=\rho_0(B)$ is what makes $f$ and $g$ have the same norm and the same centring; without it the algebra does not close. And the relaxation drops the requirement that $f,g$ take two values, which is why the rounding step in Problem 4(e) can lose.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Let $W$ be a symmetric affinity matrix on $N$ vertices with degrees $d_i=\sum_jW_{ij}$, $D=\diag(d)$. Show that $P=D^{-1}W$ is the Koopman (transition) matrix of the random walk on the graph, that $\pi_i=d_i/\sum_kd_k$, and that the walk is reversible.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$P_{ij}=W_{ij}/d_i\ge0$ with $\sum_jP_{ij}=1$: from vertex $i$, jump to $j$ with probability proportional to the edge weight. With $\pi_i=d_i/Z$, $Z=\sum_kd_k$: $(\pi P)_j=\sum_i\frac{d_i}{Z}\frac{W_{ij}}{d_i}=\frac{1}{Z}\sum_iW_{ij}=\frac{d_j}{Z}=\pi_j$ using $W=W^\top$. Detailed balance: $\pi_iP_{ij}=\frac{W_{ij}}{Z}=\pi_jP_{ji}$ by symmetry of $W$. So every undirected graph defines a reversible chain.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Show that the second eigenvector of $D^{-1}W$ — the Fiedler vector of normalised spectral clustering — is the subdominant singular function in the sense of Problem 4, and explain when and why the SVD becomes necessary.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Whitening by $\pi^{1/2}\propto D^{1/2}$: $\tilde P=D^{1/2}(D^{-1}W)D^{-1/2}=D^{-1/2}WD^{-1/2}=I-L_{\rm sym}$, the symmetric normalised Laplacian's complement. $\tilde P$ is symmetric, so its SVD is its eigendecomposition (up to the sign of negative eigenvalues), with the top eigenvalue $1$ on $D^{1/2}\mathbf 1$ and the second eigenvalue $1-\lambda_2(L_{\rm sym})$ on the second eigenvector. Undoing the whitening, $D^{-1/2}$ times the second eigenvector of $\tilde P$ is the second eigenvector of $D^{-1}W=I-L_{\rm rw}$, which is the Fiedler vector of Shi–Malik normalised cut. Its sign gives the two-way partition, and the eigenvalue near $1$ measures how slowly the walk leaks across the cut — the same quantity as $\sigma_1$ in Problem 4(c). So normalised spectral clustering <em>is</em> coherent-set detection for the one-step random walk on an undirected graph.</p>
+<p>The correspondence in one table:</p>
+<table>
+<tr><th>Spectral clustering</th><th>Coherent sets (paper)</th></tr>
+<tr><td>random walk, one step</td><td>stochastic dynamics over horizon $\tau$</td></tr>
+<tr><td>$P=D^{-1}W$</td><td>$\K_\tau=\Sigma_0^{-1}\Sigma_\tau$ (Eq. 22)</td></tr>
+<tr><td>eigenvalue 1, constant vector</td><td>$\lambda_0=1$, $u_0=v_0=\mathbf 1$</td></tr>
+<tr><td>Fiedler vector, eigenvalue near 1</td><td>subdominant singular pair, $\lambda_1$ near 1</td></tr>
+<tr><td>normalised cut</td><td>leakage between coherent sets, Eq. (4)</td></tr>
+<tr><td>sign threshold</td><td>Eq. (9)</td></tr>
+</table>
+<p>When $W$ is asymmetric (a directed graph, or any process without detailed balance), $\tilde P$ is not symmetric: its eigenvectors need not be real or orthogonal, and its eigenvalues can be complex, so "sign of the second eigenvector" is not defined. The singular value decomposition of $\tilde P$ always exists and is real, and its left and right vectors are the two halves of a coherent pair. That replacement — eigenvectors of a symmetric matrix by singular vectors of a non-symmetric one — is the entire content of the generalisation from metastable sets (reversible, Deuflhard–Schütte) to coherent sets (Froyland 2010, 2013), and of the paper's Eqs. (6)–(9). <span class="tier">High</span></p>
+</details></div>
+
+</main>
+<footer>Problem set accompanying Pughe-Sanford, Ding, Moore, Sengupta, Epstein, Greengard &amp; Chklovskii,
+<em>Neurons as Detectors of Coherent Sets in Sensory Dynamics</em>, NeurIPS 2025. Equation numbers refer to that paper.</footer>
+<script>
+(function () {
+  const btn = document.getElementById('toggle-all');
+  btn.addEventListener('click', () => {
+    const all = Array.from(document.querySelectorAll('details.solution'));
+    const open = all.some(d => !d.open);
+    all.forEach(d => d.open = open);
+    btn.textContent = open ? 'Hide all solutions' : 'Show all solutions';
+  });
+})();
+</script>
+</body>
+</html>

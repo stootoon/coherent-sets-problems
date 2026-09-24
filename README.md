@@ -1,0 +1,33 @@
+# Coherent sets, Koopman operators and the OU process — problem set
+
+A static, MathJax-rendered problem set (with click-to-reveal solutions) for reading
+Pughe-Sanford et al., *Neurons as Detectors of Coherent Sets in Sensory Dynamics* (NeurIPS 2025).
+
+## Publish on GitHub Pages
+
+1. Create an empty repository on GitHub (say `coherent-sets-problems`), **without** a README.
+2. In this folder:
+
+       git init
+       git add .
+       git commit -m "Problem set"
+       git branch -M main
+       git remote add origin git@github.com:<you>/coherent-sets-problems.git
+       git push -u origin main
+
+3. On GitHub: **Settings → Pages → Build and deployment → Source: "Deploy from a branch"**, branch `main`, folder `/ (root)`. Save.
+4. After a minute the site is at `https://<you>.github.io/coherent-sets-problems/`.
+
+The `.nojekyll` file tells Pages to serve the HTML as-is (no Jekyll processing, so MathJax delimiters survive).
+
+## Editing
+
+Content lives in `src/*.html` (one fragment per block). Edit a fragment, then run
+
+    python3 build.py
+
+to regenerate the top-level `*.html` files, and commit both. Solutions are `<details class="solution">` blocks.
+
+## Code
+
+`code/` holds the NumPy/SciPy scripts behind the numeric problems (4, 11, 12, 13). Run any of them with `python3 code/<name>.py`.

@@ -1,0 +1,43 @@
+<h1>Block D — Optional: coherent sets from data</h1>
+<p class="lead">Section 4 of the paper replaces the analytic $\K_\tau$ by an estimate from time-lagged covariances (Eqs. 22–24) and asserts this reduces to Eq. (18) for OU (Supplement Sec. 6). This problem checks that claim on simulated data and identifies the estimator as past–future CCA.</p>
+
+<h3 id="p13">Problem 13 — Past–future CCA recovers Eq. (18) (numeric)</h3>
+<div class="setting"><span class="label">Setting</span>
+The irreversible OU of Problem 9(d) with $c=1$, $D=I$; lag $\tau=0.5$. Features $\phi(x)=x$ (Eq. 26), so the Galerkin matrices are $\Sigma_0=\E[x_tx_t^\top]$, $\Sigma_\tau=\E[x_tx_{t+\tau}^\top]$, $\Sigma_{-\tau}=\Sigma_\tau^\top$, and Eq. (24) reads $F_\tau=\Sigma_0^{-1}\Sigma_\tau\Sigma_0^{-1}\Sigma_{-\tau}$, $B_\tau=\Sigma_0^{-1}\Sigma_{-\tau}\Sigma_0^{-1}\Sigma_\tau$. Script <code>code/p13_cca.py</code>.</div>
+<p class="goal">Goal: see that a neuron with access only to lagged second moments of its input can, in principle, compute the singular vectors of Eq. (18).</p>
+
+<div class="part"><p><span class="q">(a)</span> Simulate the process with Euler–Maruyama ($\Delta t=0.01$, $T=4000$, discard the transient) and estimate $\Sigma_0$, $\Sigma_\tau$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Analytic values for reference: $\Sigma=\begin{pmatrix}0.5&0.1667\\0.1667&0.3333\end{pmatrix}$ and $A\Sigma=\begin{pmatrix}-0.5&-0.1667\\0.1667&-0.5\end{pmatrix}$, not symmetric, so the process is irreversible and $F_\tau\ne B_\tau$ is expected. The estimator uses $k=\tau/\Delta t=50$ samples of lag; $\Sigma_0$ is estimated symmetrically from both ends of each lagged pair, $\Sigma_\tau$ from $X_0^\top X_1/n$.</p>
+<pre><code>import numpy as np
+from scipy.linalg import expm, solve_sylvester
+rng = np.random.default_rng(0)
+A = np.array([[-1., 0.], [1., -2.]]); D = np.eye(2)
+dt, T, tau = 0.01, 4000., 0.5; n = int(T/dt); k = round(tau/dt)
+x = np.zeros((n, 2)); noise = rng.standard_normal((n, 2))*np.sqrt(dt)
+for t in range(n-1): x[t+1] = x[t] + A @ x[t]*dt + noise[t]
+x = x[n//10:]; X0, X1 = x[:-k], x[k:]
+S0 = (X0.T@X0 + X1.T@X1)/(2*len(X0)); St = X0.T@X1/len(X0); Smt = St.T
+F_hat = np.linalg.solve(S0, St) @ np.linalg.solve(S0, Smt)     # Eq. (24)
+B_hat = np.linalg.solve(S0, Smt) @ np.linalg.solve(S0, St)</code></pre>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Show analytically that Eq. (24) with linear features equals the matrices of Eq. (18), then compare eigenvalues and eigenvectors of the data estimates with the analytic ones.</p>
+<details class="solution"><summary>Solution</summary>
+<p>From Problem 10(a), $\Sigma_\tau=\E[x_tx_{t+\tau}^\top]=\Sigma e^{A^\top\tau}$ and $\Sigma_{-\tau}=e^{A\tau}\Sigma$, $\Sigma_0=\Sigma$. Substituting into Eq. (24):
+$$F_\tau=\Sigma^{-1}\Sigma e^{A^\top\tau}\,\Sigma^{-1}e^{A\tau}\Sigma=e^{A^\top\tau}\Sigma^{-1}e^{A\tau}\Sigma=M^\top,\qquad
+B_\tau=\Sigma^{-1}e^{A\tau}\Sigma\,\Sigma^{-1}\Sigma e^{A^\top\tau}=\Sigma^{-1}e^{A\tau}\Sigma e^{A^\top\tau}=N^\top,$$
+exactly the two matrices of Eq. (18). (This is the Supplement Sec. 6 claim; note it needs $\Sigma_0=\Sigma$, i.e. a stationary process with a genuine covariance — the same caveat as Problem 12(d).) Numerically, with $\tau=0.5$:</p>
+<table>
+<tr><th></th><th>eigenvalues (data)</th><th>eigenvalues (analytic)</th><th>top eigenvector (data)</th><th>top eigenvector (analytic)</th></tr>
+<tr><td>$F_\tau$ ($v$, present)</td><td>0.438, 0.123</td><td>0.434, 0.115</td><td>(0.928, 0.373)</td><td>(0.929, 0.371)</td></tr>
+<tr><td>$B_\tau$ ($u$, future)</td><td>0.438, 0.123</td><td>0.434, 0.115</td><td>(0.750, 0.661)</td><td>(0.747, 0.665)</td></tr>
+</table>
+<p>Eigenvalues agree to the second decimal (the residual bias is Euler–Maruyama discretisation at $\Delta t=0.01$, which perturbs the effective $\Sigma$; halving $\Delta t$ halves it), eigenvectors to three decimals. As required, $F_\tau$ and $B_\tau$ share eigenvalues but have different eigenvectors: $v_1=(0.93,0.37)$ versus $u_1=(0.75,0.66)$, an angle of about $17^\circ$. A "predictive" unit and a "retrospective" unit for this input would carry different filters, and the difference is entirely due to $c\ne0$ (Problem 9d).</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Show that the eigenvectors of $F_\tau$ are the canonical directions of CCA between $x_t$ and $x_{t+\tau}$, and the eigenvalues the squared canonical correlations.</p>
+<details class="solution"><summary>Solution</summary>
+<p>CCA between $X=x_t$ and $Y=x_{t+\tau}$ with $\Sigma_{XX}=\Sigma_{YY}=\Sigma_0$ and $\Sigma_{XY}=\Sigma_\tau$ seeks $a,b$ maximising $\operatorname{corr}(a^\top X,b^\top Y)$; the stationary conditions give the eigenproblems $\Sigma_{XX}^{-1}\Sigma_{XY}\Sigma_{YY}^{-1}\Sigma_{YX}\,a=\rho^2a$ and $\Sigma_{YY}^{-1}\Sigma_{YX}\Sigma_{XX}^{-1}\Sigma_{XY}\,b=\rho^2b$, which are precisely $F_\tau a=\rho^2a$ and $B_\tau b=\rho^2b$ with $\rho$ the canonical correlations. Equivalently, the $\rho_i$ are the singular values of the whitened cross-covariance $\Sigma_0^{-1/2}\Sigma_\tau\Sigma_0^{-1/2}$, whose right/left singular vectors are $\Sigma_0^{1/2}a$ and $\Sigma_0^{1/2}b$. Numerically: canonical correlations squared $=(0.438,0.123)=$ eigenvalues of $F_\tau$.</p>
+<p>So on linear features the whole construction is past–future CCA (Koltai et al. 2018; Wu &amp; Noé 2020, where $\sum\rho_i^2$ is the VAMP-2 score), and $\Sigma_0^{-1/2}\Sigma_\tau\Sigma_0^{-1/2}$ is $\tilde M^\top$ of Problem 10(d): the whitened transition matrix <em>is</em> the canonical-correlation matrix. The paper's contribution beyond CCA is the coherent-set reading of the sign and the identification of the two canonical bases with predictive and retrospective units; the neural claim is that a cell can run this eigenproblem on its own lagged inputs, for which Lipshutz et al. (2021) give a local Hebbian/anti-Hebbian circuit. <span class="tier">High</span> for the CCA identity; the biological plausibility of the online estimator is outside this problem set.</p>
+</details></div>

@@ -1,0 +1,181 @@
+<h1>Block C — The Ornstein–Uhlenbeck process</h1>
+<p class="lead">The paper's central result (Section 3) is that for $dx=Ax\,dt+\xi$, the subdominant singular functions are linear, $v_i^\top x$, with $v_i$ solving Eq. (18). This block derives it, explains why linear functions suffice, and probes the saddle-point case the paper's interpretation rests on.</p>
+
+<h3 id="p8">Problem 8 — Moments and the Lyapunov equation</h3>
+<div class="setting"><span class="label">Setting</span>
+$dx=Ax\,dt+\sqrt D\,dW$, $x\in\R^n$, $A$ real; $\bar x(t)=\E[x_t]$, $\Sigma(t)=\E[x_tx_t^\top]$ (for zero mean).</div>
+<p class="goal">Goal: derive the paper's Eqs. (14)–(15) with an intuition for the Lyapunov equation, and see exactly what fails at a saddle.</p>
+
+<div class="part"><p><span class="q">(a)</span> Derive $d\bar x/dt=A\bar x$ and $d\Sigma/dt=A\Sigma+\Sigma A^\top+D$ via Itô. Conclude that for stable $A$ the stationary mean is zero and obtain Eq. (15).</p>
+<details class="solution"><summary>Solution</summary>
+<p>Mean: take expectations of the SDE; the noise term has zero mean, so $d\bar x/dt=A\bar x$ and $\bar x(t)=e^{At}\bar x(0)\to0$ when all eigenvalues of $A$ have negative real part. Zero mean is <em>forced</em> by stationarity, not just preserved.</p>
+<p>Covariance: Itô's product rule, $d(xx^\top)=(dx)x^\top+x(dx)^\top+(dx)(dx)^\top$ with $(dx)(dx)^\top=\sqrt D\,dW\,dW^\top\sqrt D^\top=D\,dt$:
+$$d(xx^\top)=(Axx^\top+xx^\top A^\top+D)\,dt+\text{(zero-mean martingale terms)}.$$
+Taking expectations, $\dot\Sigma=A\Sigma+\Sigma A^\top+D$. Stationarity $\dot\Sigma=0$ gives the Lyapunov equation $A\Sigma+\Sigma A^\top=-D$, Eq. (15). Read it as a balance: the drift term contracts the covariance (for stable $A$), $D$ injects variance, and $\Sigma$ is where they cancel. Scalar case: $2a\sigma^2+d=0\Rightarrow\sigma^2=d/(2|a|)$.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Verify that $\Sigma=\int_0^\infty e^{At}De^{A^\top t}\,dt$ solves Eq. (15) for stable $A$ and interpret it.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$A\Sigma+\Sigma A^\top=\int_0^\infty\big(Ae^{At}De^{A^\top t}+e^{At}De^{A^\top t}A^\top\big)dt=\int_0^\infty\frac{d}{dt}\big(e^{At}De^{A^\top t}\big)dt=\big[e^{At}De^{A^\top t}\big]_0^\infty=0-D=-D$, using $e^{At}\to0$ for stable $A$.</p>
+<p>Interpretation: the stationary state is $x_t=\int_{-\infty}^te^{A(t-s)}\sqrt D\,dW_s$, a sum of all past noise kicks, each propagated forward and shrunk by $e^{A(t-s)}$; the covariance adds up their (independent) contributions. Discrete-time analogue: the Kalman-filter prediction covariance fixed point $\Sigma=\Phi\Sigma\Phi^\top+Q$ with $\Phi=e^{A\Delta t}$. Uniqueness: the Sylvester equation $A\Sigma+\Sigma A^\top=-D$ has a unique solution iff no two eigenvalues of $A$ sum to zero (Bhatia &amp; Rosenthal 1997), which stable $A$ satisfies automatically.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Show that $\rho_0(x)\propto\exp(-\tfrac12x^\top\Sigma^{-1}x)$ satisfies $L\rho_0=0$ when $\Sigma$ solves Eq. (15).</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\nabla\rho_0=-\Sigma^{-1}x\,\rho_0$. Using the expansion from Problem 6(d),
+$$L\rho_0=-(\tr A)\rho_0-(Ax)\cdot\nabla\rho_0+\tfrac12\nabla\!\cdot(D\nabla\rho_0)
+=\rho_0\Big[-\tr A+x^\top A^\top\Sigma^{-1}x-\tfrac12\tr(D\Sigma^{-1})+\tfrac12x^\top\Sigma^{-1}D\Sigma^{-1}x\Big],$$
+where the last two terms come from $\nabla\!\cdot(-D\Sigma^{-1}x\,\rho_0)=-\tr(D\Sigma^{-1})\rho_0+x^\top\Sigma^{-1}D\Sigma^{-1}x\,\rho_0$. Now use the Lyapunov equation to eliminate $D$: $\Sigma^{-1}D\Sigma^{-1}=-(\Sigma^{-1}A+A^\top\Sigma^{-1})$, so $\tfrac12x^\top\Sigma^{-1}D\Sigma^{-1}x=-x^\top A^\top\Sigma^{-1}x$ (the two quadratic forms are transposes of the same scalar), cancelling the second term; and $\tr(D\Sigma^{-1})=-\tr(A\Sigma\Sigma^{-1}+\Sigma A^\top\Sigma^{-1})=-2\tr A$, so $-\tfrac12\tr(D\Sigma^{-1})=\tr A$, cancelling the first. Hence $L\rho_0=0$. (Alternatively: a linear SDE with Gaussian initial condition stays Gaussian, and (a) fixes its moments.)</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> Take $A=\diag(-1,2)$, $D=I$. Solve the Sylvester equation, show $\Sigma$ is indefinite, and explain why Eq. (14) then defines no probability density.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Componentwise, $(A\Sigma+\Sigma A^\top)_{ij}=(a_i+a_j)\Sigma_{ij}=-D_{ij}$. With $a=(-1,2)$: $\Sigma_{11}=-1/(2\cdot(-1))=\tfrac12$, $\Sigma_{22}=-1/(2\cdot2)=-\tfrac14$, $\Sigma_{12}\cdot(-1+2)=0\Rightarrow\Sigma_{12}=0$. So $\Sigma=\diag(\tfrac12,-\tfrac14)$, indefinite. Then $\rho_0\propto\exp(-x_1^2+2x_2^2)$ <em>grows</em> along the unstable direction and is not normalisable. The integral formula of (b) diverges for the same reason. What Eq. (14) gives at a saddle is a formal zero of $L$ (Kwon, Ao &amp; Thouless 2005), describing the local shape of the density near the fixed point along stable directions and its growth rate along unstable ones — not a stationary distribution. Consequently $L^2(\rho_0)$, the adjoint of Problem 7, the contraction bound, and the compactness behind Eq. (7) are all unavailable as stated. This is the paper's open issue (i); its own suggested repair is to localise (window or condition on staying near the saddle), which would restore a normalisable reference measure. <span class="tier">High</span> that the gap exists; <span class="tier">Medium</span> on how much of the saddle interpretation survives a rigorous treatment.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(e)</span> What goes wrong for $A=\diag(-1,+1)$, $D=I$?</p>
+<details class="solution"><summary>Solution</summary>
+<p>Now $a_1+a_2=0$, so the $(1,2)$ equation reads $0\cdot\Sigma_{12}=0$: $\Sigma_{12}$ is undetermined and the Sylvester equation has a one-parameter family of solutions. This is precisely the excluded case "eigenvalues related by sign reversal" mentioned after Eq. (15). The symmetric saddle $\pm1$ is the natural first example one reaches for, and it is exactly the degenerate one; Problem 12 uses unequal rates for this reason.</p>
+</details></div>
+
+<h3 id="p9">Problem 9 — The reverse-time OU process</h3>
+<div class="setting"><span class="label">Setting</span>
+Given (Anderson 1982; Haussmann &amp; Pardoux 1986): the time reversal of a stationary diffusion $dx=b(x)\,dt+\sqrt D\,dW$ with stationary density $\rho_0$ is again a diffusion with the same $D$ and drift $b_{\rm rev}(x)=-b(x)+D\nabla\log\rho_0(x)$. This is the formula behind reverse-time SDEs in diffusion models.</div>
+<p class="goal">Goal: identify the reversed OU explicitly, and get a clean matrix criterion for reversibility.</p>
+
+<div class="part"><p><span class="q">(a)</span> Compute $\nabla\log\rho_0$ for the OU and show $A_{\rm rev}=\Sigma A^\top\Sigma^{-1}$, using the Lyapunov equation to eliminate $D$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\nabla\log\rho_0=-\Sigma^{-1}x$, so $b_{\rm rev}=-Ax-D\Sigma^{-1}x$. From $D=-(A\Sigma+\Sigma A^\top)$: $D\Sigma^{-1}=-A-\Sigma A^\top\Sigma^{-1}$, hence
+$$b_{\rm rev}(x)=-Ax+Ax+\Sigma A^\top\Sigma^{-1}x=\Sigma A^\top\Sigma^{-1}\,x.$$
+The reversed process is linear with drift matrix $A_{\rm rev}=\Sigma A^\top\Sigma^{-1}$. Intuition: naïve reversal ($-A$) would run away from the fixed point; the score term $D\nabla\log\rho_0$ pulls back toward high stationary density; for a Gaussian the two combine into a linear drift that is $A^\top$ in $\Sigma$-adapted coordinates.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Show the reversed process has the same $D$, the same stationary covariance $\Sigma$, and the same spectrum as $A$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Same $D$ is part of the reversal theorem. Lyapunov for the reversed drift: $A_{\rm rev}\Sigma+\Sigma A_{\rm rev}^\top=\Sigma A^\top+A\Sigma=-D$, so $\Sigma$ solves the reversed Lyapunov equation too. $A_{\rm rev}$ is similar to $A^\top$, hence has the eigenvalues of $A$; in particular it is stable, and the reversed process is a legitimate stationary OU process. The reversed process is the one whose Koopman operator is $\K^\dagger_\tau$ (Problem 7d).</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Show $A_{\rm rev}=A$ iff $A\Sigma$ is symmetric, and that this is also the condition for $\tilde M=\Sigma^{-1/2}e^{A\tau}\Sigma^{1/2}$ to be symmetric.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\Sigma A^\top\Sigma^{-1}=A\iff\Sigma A^\top=A\Sigma\iff(A\Sigma)^\top=A\Sigma$. For $\tilde M$: $\tilde M^\top=\Sigma^{1/2}e^{A^\top\tau}\Sigma^{-1/2}$, and $\tilde M^\top=\tilde M\iff e^{A\tau}=\Sigma e^{A^\top\tau}\Sigma^{-1}=e^{\Sigma A^\top\Sigma^{-1}\tau}=e^{A_{\rm rev}\tau}$. If $A\Sigma$ is symmetric this holds for every $\tau$; conversely, differentiating at $\tau=0$ gives $A=A_{\rm rev}$. So
+$$\text{reversible}\iff A_{\rm rev}=A\iff A\Sigma=\Sigma A^\top\iff\tilde M=\tilde M^\top\iff\K^\dagger_\tau=\K_\tau .$$
+The antisymmetric part of $A\Sigma$ is the probability current of the stationary state; its vanishing is detailed balance (Pavliotis 2014, §4.6). When it vanishes the singular vectors of $\tilde M$ are its eigenvectors, $u_i=v_i$, and the paper's predictive/retrospective distinction collapses. The distinction is therefore a claim about broken detailed balance in the stimulus dynamics.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> For $A=\begin{pmatrix}-1&0\\c&-2\end{pmatrix}$, $D=I$, solve for $\Sigma$, find the value of $c$ that makes the process reversible, and confirm the eigenvalues of $A$ are real for all $c$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Write $\Sigma=\begin{pmatrix}s_{11}&s_{12}\\s_{12}&s_{22}\end{pmatrix}$. Then $A\Sigma=\begin{pmatrix}-s_{11}&-s_{12}\\cs_{11}-2s_{12}&cs_{12}-2s_{22}\end{pmatrix}$ and $A\Sigma+(A\Sigma)^\top=-I$ gives $-2s_{11}=-1$, $-3s_{12}+cs_{11}=0$, $2cs_{12}-4s_{22}=-1$, so
+$$s_{11}=\tfrac12,\qquad s_{12}=\tfrac c6,\qquad s_{22}=\tfrac{c^2}{12}+\tfrac14,\qquad A\Sigma=\begin{pmatrix}-\tfrac12&-\tfrac c6\\ \tfrac c6&-\tfrac12\end{pmatrix}.$$
+$A\Sigma$ is symmetric iff $c=0$. So the process is reversible only when $A$ is diagonal (then $D=I$ and $A$ commute and $\Sigma$ is diagonal); any coupling $c\ne0$ makes it irreversible, with probability current $\propto c$. $A$ is lower-triangular, so its eigenvalues are $-1$ and $-2$ for every $c$, real and distinct, with real eigenvectors — the paper's standing assumption holds. This is the working example for Problems 12–13: a stable, real-spectrum OU for which $u_i\ne v_i$.</p>
+</details></div>
+
+<h3 id="p10">Problem 10 — Eq. (18) from the sibling kernel</h3>
+<div class="setting"><span class="label">Setting</span>
+$F_\tau=\K_\tau\K^\dagger_\tau$ acts as $F_\tau f(s)=\int f(x)\,q(x\mid s)\,dx$ with $q(x\mid s)=\int p_\tau(y\mid s)\,p(x\mid y)\,dy$: go forward from $s$ to $y$, then Bayes-invert back to a "sibling" $x$ that could have produced the same $y$. Likewise $B_\tau=\K^\dagger_\tau\K_\tau$ goes backward then forward. All conditionals are Gaussian for OU.</div>
+<p class="goal">Goal: derive both equations of Eq. (18) and the whitened form in the abstract.</p>
+
+<div class="part"><p><span class="q">(a)</span> Show $\operatorname{Cov}(X_t,X_{t+\tau})=\Sigma e^{A^\top\tau}$ and hence $\E[X_{t+\tau}\mid X_t=s]=e^{A\tau}s$, $\E[X_t\mid X_{t+\tau}=r]=\Sigma e^{A^\top\tau}\Sigma^{-1}r$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Solving the SDE from $t$ to $t+\tau$: $X_{t+\tau}=e^{A\tau}X_t+\eta$ with $\eta=\int_t^{t+\tau}e^{A(t+\tau-s)}\sqrt D\,dW_s$ independent of $X_t$, $\operatorname{Cov}(\eta)=\Sigma_\tau=\int_0^\tau e^{At}De^{A^\top t}dt$. Then $\operatorname{Cov}(X_t,X_{t+\tau})=\E[X_tX_t^\top]e^{A^\top\tau}=\Sigma e^{A^\top\tau}$. Gaussian conditioning $\E[Y\mid X=s]=C_{YX}C_{XX}^{-1}s$:
+$$\E[X_{t+\tau}\mid X_t=s]=e^{A\tau}\Sigma\,\Sigma^{-1}s=e^{A\tau}s,\qquad\E[X_t\mid X_{t+\tau}=r]=\Sigma e^{A^\top\tau}\,\Sigma^{-1}r,$$
+the second using $\operatorname{Cov}(X_{t+\tau})=\Sigma$ by stationarity. The backward conditional is linear regression of the past on the future.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Show the backward mean map is the adjoint of the forward one in the inner product $\ip{a,b}_{\Sigma^{-1}}=a^\top\Sigma^{-1}b$, and equals $e^{A_{\rm rev}\tau}$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\ip{e^{A\tau}a,b}_{\Sigma^{-1}}=a^\top e^{A^\top\tau}\Sigma^{-1}b$ and $\ip{a,\Sigma e^{A^\top\tau}\Sigma^{-1}b}_{\Sigma^{-1}}=a^\top\Sigma^{-1}\Sigma e^{A^\top\tau}\Sigma^{-1}b$ — equal. And $\Sigma e^{A^\top\tau}\Sigma^{-1}=e^{\Sigma A^\top\Sigma^{-1}\tau}=e^{A_{\rm rev}\tau}$ (conjugation commutes with the exponential). So the backward mean is the mean of the reversed OU of Problem 9, and the $\Sigma^{-1}$-adjoint is the finite-dimensional shadow of the $\rho_0$-adjoint: on linear observables $v^\top x$, $\ip{v^\top x,w^\top x}_{\rho_0}=v^\top\Sigma w$, so adjointness in $L^2(\rho_0)$ restricted to linear functions is adjointness in the $\Sigma$ (dually $\Sigma^{-1}$) inner product. $\Sigma^{-1}$ is the Fisher metric of the Gaussian family; "backward = Fisher-adjoint of forward" is a coordinate-free way to say it.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Compose the two means to get the mean $Ms$ of $q(\cdot\mid s)$, act on $f(x)=v^\top x$, and derive the first equation of (18). Repeat for $B_\tau$ to get the second.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$q$ is Gaussian in $x$ (a Gaussian mixture over $y$ of Gaussians with means linear in $y$, all of fixed covariance, is Gaussian), with mean $\E_q[x\mid s]=\Sigma e^{A^\top\tau}\Sigma^{-1}\E[X_{t+\tau}\mid X_t=s]=Ms$, $M=\Sigma e^{A^\top\tau}\Sigma^{-1}e^{A\tau}$. For linear $f$, $F_\tau f(s)=\E_q[v^\top x\mid s]=v^\top Ms$. The eigen-equation $F_\tau f=\lambda^2f$ becomes $v^\top M=\lambda^2v^\top$, i.e. $M^\top v=\lambda^2v$:
+$$e^{A^\top\tau}\Sigma^{-1}e^{A\tau}\Sigma\;v=\lambda^2v,$$
+the first equation of (18). For $B_\tau f(r)=\E\big[\E[f(X_{t+\tau})\mid X_t]\mid X_{t+\tau}=r\big]$: inner mean $e^{A\tau}X_t$, outer $e^{A\tau}\Sigma e^{A^\top\tau}\Sigma^{-1}r=:Nr$, so $B_\tau(u^\top x)=u^\top Nx$ and $N^\top u=\lambda^2u$:
+$$\Sigma^{-1}e^{A\tau}\Sigma e^{A^\top\tau}\;u=\lambda^2u,$$
+the second equation of (18). The covariance of $q$ never entered: it would only appear when $F_\tau$ acts on quadratic and higher observables, which is Problem 11.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> Substitute $v=\Sigma^{-1/2}w$ to get $\tilde M^\top\tilde M\,w=\lambda^2w$ with $\tilde M=\Sigma^{-1/2}e^{A\tau}\Sigma^{1/2}$. Identify $\lambda_i$, and state precisely what "singular vector of the whitened transition matrix" means for $v_i$ and $u_i$. Show also that $\lambda_i\le1$ for stable $A$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\tilde M^\top\tilde M=\Sigma^{1/2}e^{A^\top\tau}\Sigma^{-1}e^{A\tau}\Sigma^{1/2}$, so $M^\top=e^{A^\top\tau}\Sigma^{-1}e^{A\tau}\Sigma=\Sigma^{-1/2}(\tilde M^\top\tilde M)\Sigma^{1/2}$. Hence $M^\top v=\lambda^2v\iff\tilde M^\top\tilde M(\Sigma^{1/2}v)=\lambda^2(\Sigma^{1/2}v)$: $w=\Sigma^{1/2}v$ is a right singular vector of $\tilde M$ and $\lambda$ the corresponding singular value. Similarly $N^\top=\Sigma^{-1/2}(\tilde M\tilde M^\top)\Sigma^{1/2}$, so $w'=\Sigma^{1/2}u$ is a left singular vector of $\tilde M$. In whitened coordinates $z=\Sigma^{-1/2}x$ (identity covariance), the singular functions are simply $v_i(x)=v_i^\top x=w_i^\top z$ and $u_i(x)=w_i'^\top z$: the projections of the whitened state onto the right and left singular vectors of the whitened one-step map $\tilde M$, which is the transition matrix in $z$-coordinates ($z_{t+\tau}=\tilde Mz_t+\text{noise}$). That is the abstract's statement.</p>
+<p>Bound: by stationarity $\Sigma=e^{A\tau}\Sigma e^{A^\top\tau}+\Sigma_\tau$ (propagate the old covariance and add the new noise), so $\tilde M\tilde M^\top=\Sigma^{-1/2}(\Sigma-\Sigma_\tau)\Sigma^{-1/2}=I-\Sigma^{-1/2}\Sigma_\tau\Sigma^{-1/2}\preceq I$. All singular values are $\le1$, matching Problem 7(b), and $\lambda_i=1$ only along directions receiving no noise over the horizon. In Problem 13 the same $\tilde M$ appears as the canonical-correlation matrix between $x_t$ and $x_{t+\tau}$ and the $\lambda_i$ as canonical correlations.</p>
+</details></div>
+
+<h3 id="p11">Problem 11 — Why linear observables suffice</h3>
+<div class="setting"><span class="label">Setting</span>
+1-D reversible OU $dx=-ax\,dt+dW$ ($a&gt;0$, $D=1$, $\sigma^2=1/(2a)$). Probabilists' Hermite polynomials $\mathrm{He}_n$ satisfy $\mathrm{He}_n''(\xi)-\xi\mathrm{He}_n'(\xi)+n\mathrm{He}_n(\xi)=0$. Script <code>code/p11_hermite.py</code>.</div>
+<p class="goal">Goal: understand the sentence after Eq. (18) — "other eigenfunctions … represent higher-order polynomials … associated with less dominant eigenvalues" — and see which assumption it needs.</p>
+
+<div class="part"><p><span class="q">(a)</span> Verify that $g_n(x)=\mathrm{He}_n(x/\sigma)$ is an eigenfunction of $L^\dagger=-ax\,\partial_x+\tfrac12\partial_x^2$ with eigenvalue $-na$, hence of $\K_\tau$ with eigenvalue $e^{-na\tau}$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>With $\xi=x/\sigma$: $g_n'=\mathrm{He}_n'/\sigma$, $g_n''=\mathrm{He}_n''/\sigma^2$, so
+$$L^\dagger g_n=-ax\frac{\mathrm{He}_n'}{\sigma}+\frac{\mathrm{He}_n''}{2\sigma^2}=\frac{1}{2\sigma^2}\Big[\mathrm{He}_n''-2a\sigma^2\,\xi\,\mathrm{He}_n'\Big]=\frac{1}{2\sigma^2}\Big[\mathrm{He}_n''-\xi\mathrm{He}_n'\Big]=\frac{-n\,\mathrm{He}_n}{2\sigma^2}=-na\,g_n,$$
+using $2a\sigma^2=1$. Then $\K_\tau g_n=e^{L^\dagger\tau}g_n=e^{-na\tau}g_n$. The eigenfunctions are orthogonal in $L^2(\rho_0)$ (Hermite polynomials are orthogonal under the Gaussian weight), $g_0=1$ is the trivial pair, and $g_1\propto x$ is the subdominant one with eigenvalue $e^{-a\tau}$, exactly $\tilde M=e^{-a\tau}$ for the 1-D case. Degree $n$ decays $n$ times faster. Deterministic-map intuition from Problem 0(e): monomials $x^n$ were eigenfunctions of $x\mapsto e^{-a\tau}x$; noise replaces them by Hermite polynomials (the monomials' Gaussian orthogonalisation) but keeps the eigenvalues $e^{-na\tau}$.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> For general stable $A$, show that $\K_\tau$, $\K^\dagger_\tau$ and hence $F_\tau$, $B_\tau$ map polynomials of degree $\le k$ into polynomials of degree $\le k$, and describe the resulting block-triangular structure.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\K_\tau f(x)=\E[f(e^{A\tau}x+\eta)]$ with $\eta$ Gaussian independent of $x$. If $f$ is a polynomial of degree $\le k$, expanding $f(e^{A\tau}x+\eta)$ and taking the expectation over $\eta$ yields a polynomial in $x$ of degree $\le k$ (moments of $\eta$ are constants). The same holds for $\K^\dagger_\tau$, which is the Koopman operator of the reversed OU (Problem 9). So the flag of subspaces $\mathcal P_0\subset\mathcal P_1\subset\mathcal P_2\subset\cdots$ (polynomials of degree $\le k$) is invariant under $F_\tau$ and $B_\tau$; in a basis graded by degree the operators are block upper-triangular, and the spectrum is the union of the spectra of the diagonal blocks (degree-$k$ homogeneous parts modulo lower degree). The degree-$1$ block is exactly $M^\top$ (resp. $N^\top$) of Problem 10, with eigenvalues $\lambda_i^2$ = the squared singular values of $\tilde M$. In whitened coordinates the degree-$k$ block of $\K_\tau$ modulo lower degree is the symmetric tensor power $\mathrm{Sym}^k\tilde M$, so the degree-$k$ block of $F_\tau$ has eigenvalues equal to products $\lambda_{i_1}^2\cdots\lambda_{i_k}^2$. <span class="tier">High</span> for the invariant-flag statement; the spectrum of OU semigroups is worked out rigorously in Metafune, Pallara &amp; Priola, <em>J. Funct. Anal.</em> 196 (2002). Polynomials are dense in $L^2(\rho_0)$, so nothing is missed.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Conclude that the subdominant singular function of an attractive OU is linear, and state which assumption fails at a saddle.</p>
+<details class="solution"><summary>Solution</summary>
+<p>For stable $A$ every $\lambda_i\le1$ (Problems 7b, 10d), so products of $k\ge2$ of them are $\le\lambda_1^{2k}\le\lambda_1^2$, with equality only in degenerate cases. The degree-$0$ block is the trivial eigenvalue $1$, the degree-$1$ block contains $\lambda_1^2$, and every higher block is smaller. Hence the non-trivial eigenfunction of $F_\tau$ with eigenvalue closest to one is $v_1^\top x$: linear. That is the paper's claim after Eq. (18).</p>
+<p>At a saddle the argument breaks in two places. First, $\rho_0$ is not normalisable (Problem 8d), so there is no $L^2(\rho_0)$ in which to take adjoints, and $F_\tau$ is only formally defined. Second, even formally, the "singular values" of Eq. (18) straddle $1$ (Problem 12 finds $0.75$ and $1.04$ at $\tau=0.25$), so a degree-$2$ product $\lambda_1\lambda_2$ can be <em>closer</em> to one than either linear eigenvalue. The paper's rule "subdominant = closest to one" then does not obviously select a linear function. The Supplement (Sec. 3) states that it does not treat saddle points. <span class="tier">Medium</span> — a real gap, but one that the paper's proposed localisation might close.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> Numeric: discretise $L^\dagger$ on a grid for $a=1$ and confirm the spectrum and eigenfunctions.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Central differences on $[-7,7]$ with $801$ points: top eigenvalues of the discretised $L^\dagger$ are $0,-1,-2,-3,-4$ (to three decimals), and the corresponding eigenvectors have correlation $1.000$ with $\mathrm{He}_n(x/\sigma)$ on $|x|&lt;3$. The discretisation is non-symmetric (as $L^\dagger$ is under Lebesgue measure) but has real spectrum, as it must: conjugating by $\rho_0^{1/2}$ makes it symmetric, which is the reversibility of 1-D OU.</p>
+<pre><code>import numpy as np
+from numpy.polynomial.hermite_e import hermeval
+a = 1.0; sigma = np.sqrt(1/(2*a))
+N, L = 801, 7.0; x = np.linspace(-L, L, N); h = x[1]-x[0]
+D1 = (np.eye(N,k=1)-np.eye(N,k=-1))/(2*h); D2 = (np.eye(N,k=1)-2*np.eye(N)+np.eye(N,k=-1))/h**2
+Ldag = -a*np.diag(x)@D1 + 0.5*D2
+w, V = np.linalg.eig(Ldag); idx = np.argsort(-w.real)[:5]
+print(np.round(w[idx].real, 3))          # [ 0. -1. -2. -3. -4.]</code></pre>
+</details></div>
+
+<h3 id="p12">Problem 12 — Saddle-point asymptotics (numeric)</h3>
+<div class="setting"><span class="label">Setting</span>
+$A=S\,\diag(-a,b)\,S^{-1}$ with $a=1$, $b=\tfrac12$, stable eigenvector $e_s=(1,0)$, unstable eigenvector $e_u=(1,1)/\sqrt2$ (oblique), $D=I$. Script <code>code/p12_saddle.py</code>. The eigenvector equations of Eq. (18) are solved directly (no whitening: $\Sigma^{1/2}$ does not exist for indefinite $\Sigma$).</div>
+<p class="goal">Goal: verify the geometric claim behind Fig. 1b,c — predictive filter orthogonal to the stable subspace, retrospective filter orthogonal to the unstable one — and see which steps are formal.</p>
+
+<div class="part"><p><span class="q">(a)</span> Solve the Sylvester equation and confirm $\Sigma$ is indefinite.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$A=\begin{pmatrix}-1&1.5\\0&0.5\end{pmatrix}$, and <code>solve_sylvester(A, A.T, -D)</code> returns $\Sigma=\begin{pmatrix}-4&-3\\-3&-1\end{pmatrix}$ with eigenvalues $-5.85$ and $0.85$: indefinite, residual $10^{-16}$. (Eigenvalues $-1$ and $0.5$ do not sum to zero, so the solution is unique.)</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> For $\tau\in\{0.25,0.5,1,2,4,8\}$ compute the eigenvectors of $M^\top=e^{A^\top\tau}\Sigma^{-1}e^{A\tau}\Sigma$ and $N^\top=\Sigma^{-1}e^{A\tau}\Sigma e^{A^\top\tau}$. Take $v_1$ as the eigenvector with the <em>largest</em> $\lambda^2$ (expanding coherent set) and $u_2$ with the <em>smallest</em> (contracting). Tabulate the angle of $v_1$ to $e_s$ and of $u_2$ to $e_u$.</p>
+<details class="solution"><summary>Solution</summary>
+<table>
+<tr><th>$\tau$</th><th>eigenvalues of $M^\top$</th><th>$\angle(v_1,e_s)$</th><th>$\angle(v_1,\ell_u)$</th><th>$\angle(u_2,e_u)$</th></tr>
+<tr><td>0.25</td><td>0.746, 1.044</td><td>44.0°</td><td>46.0°</td><td>78.5°</td></tr>
+<tr><td>0.5</td><td>0.553, 1.096</td><td>55.0°</td><td>35.0°</td><td>80.3°</td></tr>
+<tr><td>1</td><td>0.295, 1.246</td><td>70.9°</td><td>19.1°</td><td>83.5°</td></tr>
+<tr><td>2</td><td>0.068, 2.003</td><td>84.9°</td><td>5.1°</td><td>87.7°</td></tr>
+<tr><td>4</td><td>0.002, 11.13</td><td>89.7°</td><td>0.3°</td><td>89.9°</td></tr>
+<tr><td>8</td><td>0.000, 596.2</td><td>90.0°</td><td>0.0°</td><td>90.0°</td></tr>
+</table>
+<p>Here $\ell_u$ is the <em>left</em> eigenvector of $A$ for the unstable eigenvalue (row of $S^{-1}$), which is orthogonal to $e_s$ by biorthogonality. All eigenvalues are real over the whole range tested (max imaginary part $0$). Note the eigenvalues: one grows like $e^{2b\tau}$ and one decays like $e^{-2a\tau}$ (their product is $\det e^{A\tau}{}^2=e^{2(b-a)\tau}$), so for large $\tau$ <em>neither</em> is close to one — the paper's selection rule "closest to unity" is only meaningful at short horizons.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Explain the limits $\angle(v_1,e_s)\to90^\circ$ and $\angle(u_2,e_u)\to90^\circ$ (the Supplement Sec. 4 claim) via the rank-one asymptotics of $e^{A\tau}$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>For large $\tau$, $e^{A\tau}\approx e^{b\tau}e_u\ell_u^\top$ (dominant unstable mode; $\ell_u^\top e_u=1$). Then
+$$M^\top=e^{A^\top\tau}\Sigma^{-1}e^{A\tau}\Sigma\approx e^{2b\tau}(e_u^\top\Sigma^{-1}e_u)\;\ell_u\,(\ell_u^\top\Sigma),$$
+a rank-one matrix $c\,\ell_u\beta^\top$ with $\beta=\Sigma\ell_u$. Its non-zero eigenvector is $\ell_u$, so $v_1\to\ell_u\perp e_s$: the predictive filter becomes orthogonal to the stable subspace, i.e. it ignores the component of the state that will decay and reads out the coefficient of the unstable mode — the only thing that determines the far future. Similarly
+$$N^\top=\Sigma^{-1}e^{A\tau}\Sigma e^{A^\top\tau}\approx e^{2b\tau}(\ell_u^\top\Sigma\ell_u)\;(\Sigma^{-1}e_u)\,e_u^\top,$$
+whose dominant eigenvector is $\Sigma^{-1}e_u$ and whose <em>other</em> eigenvector, for the small eigenvalue, must lie in the null space of the rank-one part: $e_u^\top u_2=0$, so $u_2\perp e_u$. The retrospective filter ignores the unstable component — which carries no information about where the trajectory came from, since everything gets amplified along $e_u$ — and reads out the stable component, whose present value is the decayed memory of the past. Left/right eigenvector biorthogonality of $A$ is doing all the work; $\Sigma$ only fixes the finite-$\tau$ corrections. <span class="tier">High</span> for the 2-D mechanism; the paper flags (open issue iii) that with several unstable directions the picture is not established.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> List every step of (a)–(c) that relied on $\Sigma$ being a covariance, and state what is formal rather than rigorous at the saddle.</p>
+<details class="solution"><summary>Solution</summary>
+<ul>
+<li>Eq. (18) itself was derived (Problem 10) from Gaussian conditioning with $\Sigma=\operatorname{Cov}(X_t)$ and from the $\rho_0$-adjoint. With indefinite $\Sigma$, "$\E[X_t\mid X_{t+\tau}]$" under a non-normalisable $\rho_0$ has no probabilistic meaning; the matrices $M^\top$, $N^\top$ are the formal continuation of the stable-case formulas.</li>
+<li>The interpretation of eigenvalues as $\lambda^2\le1$, of singular functions as members of an orthonormal basis, and of sign-thresholding as approximately optimal for Eq. (4) (Problem 5a) all used the contraction on $L^2(\rho_0)$ and the balance constraint under a probability measure. None applies.</li>
+<li>Whitening ($\Sigma^{1/2}$) is unavailable; the reduction to an SVD of a real matrix is lost, and realness of the eigenvalues in (b) is an observed fact for this example, not a theorem.</li>
+<li>What survives: the limits in (c) depend only on the eigenstructure of $A$, so the qualitative claim "predictive $\perp$ stable, retrospective $\perp$ unstable" is robust. What would make the intermediate-$\tau$ objects rigorous is a normalisable reference measure concentrated near the saddle — a windowed, discounted, or committor-conditioned process — which is exactly what the paper's open issue (i) proposes. <span class="tier">Medium</span> that such a construction reproduces Eq. (18) up to corrections; it has not been shown.</li>
+</ul>
+</details></div>

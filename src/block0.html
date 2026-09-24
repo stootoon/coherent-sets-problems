@@ -1,0 +1,78 @@
+<h1>Block 0 — Transfer operators from scratch</h1>
+<p class="lead">Two operators are attached to any dynamical system: one moves <em>functions</em> (observables) and one moves <em>densities</em>. Everything in the paper's Section 2 is a statement about these two and their relationship.</p>
+
+<h3 id="p0">Problem 0 — Koopman and Perron–Frobenius operators for a deterministic map</h3>
+<div class="setting"><span class="label">Setting</span>
+A map $\Phi:\X\to\X$ on the real line (or an interval). A <em>density</em> is a non-negative $p$ with $\int p=1$; an <em>observable</em> is a function $f:\X\to\R$.
+The dynamics is $x_{t+1}=\Phi(x_t)$.</div>
+<p class="goal">Goal: know what the two operators are, why one is linear even for nonlinear $\Phi$, and why they are adjoint.</p>
+
+<div class="part"><p><span class="q">(a)</span> Define the Koopman operator by $(\K f)(x)=f(\Phi(x))$. Show that $\K$ is linear on the space of observables even when $\Phi$ is nonlinear. What has been traded to obtain linearity?</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\K(\alpha f+\beta g)(x)=(\alpha f+\beta g)(\Phi(x))=\alpha f(\Phi(x))+\beta g(\Phi(x))=(\alpha\K f+\beta\K g)(x)$. Linearity comes from the <em>evaluation</em> $f\mapsto f(y)$ being linear in $f$ for every fixed $y$; the nonlinearity of $\Phi$ is entirely absorbed in <em>where</em> we evaluate. $\K$ is a composition operator, $\K f=f\circ\Phi$.</p>
+<p>The trade: a nonlinear map on a finite-dimensional state space $\X$ has become a linear map on the infinite-dimensional space of functions on $\X$. Nothing has been approximated; the price is dimension. Every "Koopman method" (DMD, EDMD, VAMP, this paper's Galerkin step in Section 4) is a way of choosing a finite-dimensional subspace of observables on which $\K$ acts approximately invariantly.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Define the Perron–Frobenius operator $\P$ by the requirement that it pushes densities forward: for every measurable set $B$,
+$$\int_B(\P p)(y)\,dy=\int_{\Phi^{-1}(B)}p(x)\,dx .$$
+Derive the explicit formula $(\P p)(y)=\sum_{x:\Phi(x)=y}p(x)/|\Phi'(x)|$ from the change-of-variables rule.</p>
+<details class="solution"><summary>Solution</summary>
+<p>The definition says: the mass that $\P p$ assigns to $B$ equals the mass $p$ assigns to the points that will land in $B$. So $\P p$ is the density of $\Phi(X)$ when $X\sim p$ — the pushforward of $p$ by $\Phi$.</p>
+<p>Split $\X$ into intervals on which $\Phi$ is monotone; on each such branch $\Phi_k$ with inverse $\Phi_k^{-1}$, substitute $y=\Phi_k(x)$, $dy=|\Phi_k'(x)|\,dx$:
+$$\int_{\Phi_k^{-1}(B)}p(x)\,dx=\int_B p\big(\Phi_k^{-1}(y)\big)\,\frac{dy}{|\Phi_k'(\Phi_k^{-1}(y))|}.$$
+Summing over branches and reading off the integrand,
+$$(\P p)(y)=\sum_{x\in\Phi^{-1}(y)}\frac{p(x)}{|\Phi'(x)|}.$$
+The Jacobian factor is the same one that appears in the density of a transformed random variable; $\P$ is that rule applied as a linear operator.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Compute $\P p$ for the contraction $\Phi(x)=ax$ with $|a|&lt;1$, and for the doubling map $\Phi(x)=2x \bmod 1$ on $[0,1]$. Observe what the doubling-map formula does to the two preimages.</p>
+<details class="solution"><summary>Solution</summary>
+<p><em>Contraction.</em> One preimage $x=y/a$, $|\Phi'|=|a|$: $(\P p)(y)=\dfrac{1}{|a|}\,p\!\left(\dfrac{y}{a}\right)$. Mass is squeezed toward the origin and rescaled to keep $\int\P p=1$. Iterating, $\P^n p\to\delta_0$: the only invariant density is the point mass at the fixed point.</p>
+<p><em>Doubling map.</em> Every $y\in[0,1)$ has two preimages $y/2$ and $(y+1)/2$, each with $\Phi'=2$:
+$$(\P p)(y)=\tfrac12\Big[p\!\left(\tfrac y2\right)+p\!\left(\tfrac{y+1}2\right)\Big].$$
+$\P$ <em>averages</em> $p$ over the two preimages. Any $p$ is smoothed toward the uniform density, which is the invariant density ($\P 1=1$). Expanding maps mix; contracting maps concentrate. The Koopman operator sees the same fact from the other side: $\K f(x)=f(2x\bmod 1)$ makes $f$ oscillate twice as fast, so no smooth non-constant $f$ can be an eigenfunction.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> Prove the duality $\int(\K f)\,p\,dx=\int f\,(\P p)\,dx$, i.e. $\K$ and $\P$ are adjoint with respect to the Lebesgue inner product. Interpret.</p>
+<details class="solution"><summary>Solution</summary>
+<p>For an indicator $f=\mathbf 1_B$: $\int(\K\mathbf 1_B)\,p\,dx=\int\mathbf 1_B(\Phi(x))\,p(x)\,dx=\int_{\Phi^{-1}(B)}p\,dx=\int_B\P p\,dy=\int\mathbf 1_B\,(\P p)\,dy$, by the defining property in (b). Both sides are linear in $f$, indicators span (are dense in) the observables, so the identity holds for all $f$ for which either side is finite.</p>
+<p>Interpretation: $\E[f(X_{t+1})]$ for $X_t\sim p$ can be computed two ways — pull $f$ back to time $t$ and average against $p$, or push $p$ forward to time $t+1$ and average $f$ against it. The two operators are the two halves of one expectation. This is exactly the pairing $\ip{f,\K g}_\mu=\ip{\K^\dagger f,g}_\nu$ in the paper's Eq. (5); Block A and Problem 7 show what changes when the inner product is weighted by a stationary density instead of Lebesgue measure.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(e)</span> <em>Koopman eigenfunctions.</em> Show that $\K\varphi=\lambda\varphi$ means $\varphi(x_{t+1})=\lambda\varphi(x_t)$ along every trajectory. For $\Phi(x)=ax$ find all eigenfunctions of the form $x^n$ and their eigenvalues. Show that products of eigenfunctions are eigenfunctions. Which eigenfunctions have $|\lambda|=1$, and why are their level sets invariant sets?</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\K\varphi=\lambda\varphi$ reads $\varphi(\Phi(x))=\lambda\varphi(x)$ for all $x$; put $x=x_t$ and it says $\varphi(x_{t+1})=\lambda\varphi(x_t)$, so $\varphi(x_t)=\lambda^t\varphi(x_0)$ — an eigenfunction is an observable that evolves <em>linearly</em> (geometrically) under nonlinear dynamics.</p>
+<p>For $\Phi(x)=ax$: $\K x^n=(ax)^n=a^n x^n$, so $x^n$ is an eigenfunction with eigenvalue $a^n$, $n=0,1,2,\dots$ The constant function ($n=0$) always has eigenvalue $1$.</p>
+<p>Products: for a deterministic map $\K(fg)=(f\circ\Phi)(g\circ\Phi)=(\K f)(\K g)$, so if $\K\varphi_i=\lambda_i\varphi_i$ then $\K(\varphi_1\varphi_2)=\lambda_1\lambda_2\,\varphi_1\varphi_2$. The eigenfunctions form a multiplicative semigroup. This multiplicativity is <em>lost</em> for stochastic dynamics: $\E[fg\mid x]\ne\E[f\mid x]\E[g\mid x]$ in general. (In Problem 11 the OU eigenfunctions are Hermite polynomials rather than monomials for exactly this reason.)</p>
+<p>$|\lambda|=1$: for $|a|&lt;1$ only $n=0$, the constant, which carries no information. For $\Phi(x)=-x$ ($a=-1$) every $x^n$ has $|\lambda|=1$. If $\K\varphi=\varphi$ then $x\in\{\varphi=c\}\Rightarrow\varphi(\Phi(x))=\varphi(x)=c\Rightarrow\Phi(x)\in\{\varphi=c\}$: level sets of an eigenvalue-one eigenfunction are invariant sets, i.e. partitions of the state space the dynamics never crosses. If $\lambda=-1$, $\varphi^2$ has eigenvalue $1$ and its level sets $\{\varphi=\pm c\}$ are invariant. This is the deterministic ancestor of the paper's coherent sets: with noise, no non-trivial set is exactly invariant, and "eigenvalue exactly one" is replaced by "singular value closest to one over a finite horizon $\tau$".</p>
+</details></div>
+
+<h3 id="p1">Problem 1 — The stochastic versions</h3>
+<div class="setting"><span class="label">Setting</span>
+A time-homogeneous Markov process $X_t$ with transition density $p_\tau(y\mid x)$: the density of $X_{t+\tau}$ given $X_t=x$.</div>
+<p class="goal">Goal: recognise the paper's $\K_\tau$ (Eq. 1) as the stochastic Koopman operator, know its Perron–Frobenius partner, and see why a generator exists.</p>
+
+<div class="part"><p><span class="q">(a)</span> Define $\K_\tau f(x)=\E[f(X_{t+\tau})\mid X_t=x]=\int f(y)\,p_\tau(y\mid x)\,dy$ and $\P_\tau p(y)=\int p_\tau(y\mid x)\,p(x)\,dx$. Show that both reduce to Problem 0's operators when $p_\tau(y\mid x)=\delta\big(y-\Phi(x)\big)$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\K_\tau f(x)=\int f(y)\,\delta(y-\Phi(x))\,dy=f(\Phi(x))$. For $\P_\tau$ use the composition rule for the delta function, $\delta(g(x))=\sum_{k}\delta(x-x_k)/|g'(x_k)|$ over the roots $x_k$ of $g$, with $g(x)=y-\Phi(x)$:
+$$\P_\tau p(y)=\int\delta\big(y-\Phi(x)\big)p(x)\,dx=\sum_{x:\Phi(x)=y}\frac{p(x)}{|\Phi'(x)|}.$$
+So the stochastic operators are the deterministic ones with the delta kernel replaced by a spread-out kernel; a stochastic system has a whole density of "next states" from each $x$. Note how the noise removes the preimage sum: $p_\tau(y\mid x)$ is simply a function of two variables, and the Jacobian is gone.</p>
+</details></div>
+
+<div class="part"><p><span class="q">(b)</span> Show $\K_\tau\mathbf 1=\mathbf 1$ and $\int\P_\tau p\,dy=\int p\,dx$. State what each conservation law means.</p>
+<details class="solution"><summary>Solution</summary>
+<p>$\K_\tau\mathbf 1(x)=\int p_\tau(y\mid x)\,dy=1$: from every starting point the process goes <em>somewhere</em> (total probability). $\int\P_\tau p\,dy=\int\!\!\int p_\tau(y\mid x)\,p(x)\,dx\,dy=\int p(x)\,dx$: mass is conserved when densities are pushed forward. In the paper these appear as the trivial singular pair $u_0=v_0=\mathbf 1$ with $\lambda_0=1$ (Section 2), and $\P_\tau\rho_0=\rho_0$ defines the stationary density (Eq. 14).</p>
+</details></div>
+
+<div class="part"><p><span class="q">(c)</span> Prove the duality $\int(\K_\tau f)\,p\,dx=\int f\,(\P_\tau p)\,dy$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Both sides equal the double integral $\int\!\!\int f(y)\,p_\tau(y\mid x)\,p(x)\,dx\,dy=\E_{X_t\sim p}\big[f(X_{t+\tau})\big]$; the left integrates over $y$ first, the right over $x$ first (Fubini). As in Problem 0(d): pull the observable back or push the density forward, the expectation is the same. This is the Lebesgue-adjoint relation; Problem 7(c) converts it into the $\rho_0$-weighted adjoint of the paper's Eq. (16).</p>
+</details></div>
+
+<div class="part"><p><span class="q">(d)</span> Show the semigroup property $\K_{\tau_1}\K_{\tau_2}=\K_{\tau_1+\tau_2}$ from the Chapman–Kolmogorov equation, and explain why this means a generator $L^\dagger$ with $\K_\tau=e^{L^\dagger\tau}$ exists (at least formally). Identify the stationary density as an eigenvector of $\P_\tau$.</p>
+<details class="solution"><summary>Solution</summary>
+<p>Chapman–Kolmogorov for a time-homogeneous Markov process: $p_{\tau_1+\tau_2}(z\mid x)=\int p_{\tau_2}(z\mid y)\,p_{\tau_1}(y\mid x)\,dy$ (go to $y$ first, then to $z$). Then
+$$\K_{\tau_1}\K_{\tau_2}f(x)=\int p_{\tau_1}(y\mid x)\Big[\int p_{\tau_2}(z\mid y)f(z)\,dz\Big]dy=\int f(z)\Big[\int p_{\tau_2}(z\mid y)p_{\tau_1}(y\mid x)\,dy\Big]dz=\K_{\tau_1+\tau_2}f(x).$$
+Together with $\K_0=I$ this makes $\{\K_\tau\}_{\tau\ge0}$ a one-parameter semigroup. For a one-parameter semigroup that is continuous in $\tau$, the derivative at zero, $L^\dagger f=\lim_{\tau\downarrow0}(\K_\tau f-f)/\tau$, exists on a dense domain and $\K_\tau=e^{L^\dagger\tau}$ (Hille–Yosida theorem; Pavliotis 2014, §2.4). Block B computes $L^\dagger$ explicitly for diffusions: it is a second-order differential operator, and the semigroup is a PDE evolution.</p>
+<p>Stationarity: a density with $\P_\tau\rho_0=\rho_0$ for all $\tau$ is unchanged by the dynamics; it is the eigenvector of $\P_\tau$ with eigenvalue $1$, dual to $\K_\tau\mathbf 1=\mathbf 1$. At the generator level, $L\rho_0=0$ — the paper's Eq. (14).</p>
+</details></div>

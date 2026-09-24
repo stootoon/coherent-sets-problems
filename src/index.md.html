@@ -1,0 +1,41 @@
+<h1>Coherent sets, Koopman operators and the Ornstein–Uhlenbeck process</h1>
+<p class="lead">A problem set for reading <em>Neurons as Detectors of Coherent Sets in Sensory Dynamics</em>
+(Pughe-Sanford et al., NeurIPS 2025), covering the machinery of Sections 2–3 and the data-driven step of Section 4.
+Every problem is broken into parts; click <strong>Solution</strong> under each part, or use the button in the top bar.</p>
+
+<h2>What the set builds</h2>
+<p>The paper's claim is that a neuron with temporal filter $\mathbf w$ and a threshold computes
+$\operatorname{sign}(\mathbf w^\top\hat{\mathbf x})$, where $\hat{\mathbf x}$ is the lag vector of its input and
+$\mathbf w$ is a subdominant singular vector of a whitened finite-time transfer operator. To read that claim you need,
+in order:</p>
+<ol class="toc">
+  <li><a href="block0.html">Block 0</a> — what the Koopman and Perron–Frobenius operators are, first for a deterministic map, then for a Markov process. (Problems 0–1)</li>
+  <li><a href="blockA.html">Block A</a> — the same objects as matrices on a finite state space: weighted adjoints, reversibility, the SVD, coherent sets, and the exact correspondence with spectral clustering. (Problems 2–5)</li>
+  <li><a href="blockB.html">Block B</a> — continuous state space: the backward Kolmogorov generator, contraction, the $\rho_0$-adjoint. (Problems 6–7)</li>
+  <li><a href="blockC.html">Block C</a> — the Ornstein–Uhlenbeck process: Lyapunov equation, reverse-time drift, derivation of the paper's Eq. (18), why linear observables suffice, saddle-point asymptotics. (Problems 8–12)</li>
+  <li><a href="blockD.html">Block D</a> — optional: past–future CCA on simulated data recovers Eq. (18). (Problem 13)</li>
+</ol>
+
+<h2>Conventions used throughout</h2>
+<table>
+<tr><th>Object</th><th>Definition</th><th>Direction in time</th></tr>
+<tr><td>Transition density</td><td>$p_\tau(y\mid x)$: density of $X_{t+\tau}$ given $X_t=x$</td><td>—</td></tr>
+<tr><td>Koopman operator $\K_\tau$</td><td>$\K_\tau f(x)=\E[f(X_{t+\tau})\mid X_t=x]=\int f(y)\,p_\tau(y\mid x)\,dy$</td><td>pulls an observable <em>back</em>: input lives at $t+\tau$, output at $t$</td></tr>
+<tr><td>Perron–Frobenius operator $\P_\tau$</td><td>$\P_\tau p(y)=\int p_\tau(y\mid x)\,p(x)\,dx$</td><td>pushes a density <em>forward</em>: input at $t$, output at $t+\tau$</td></tr>
+<tr><td>Weighted inner products</td><td>$\ip{f,g}_\mu=\int f g\,\mu\,dx$ with $\mu$ the law of $X_t$, $\nu$ the law of $X_{t+\tau}$</td><td>—</td></tr>
+<tr><td>Adjoint $\K_\tau^\dagger$</td><td>$\ip{f,\K_\tau g}_\mu=\ip{\K^\dagger_\tau f,g}_\nu$; equals $\E[f(X_t)\mid X_{t+\tau}=\cdot\,]$</td><td>Koopman operator of the time-reversed process</td></tr>
+<tr><td>Generators</td><td>$L$ (Fokker–Planck, acts on densities), $L^\dagger$ (backward Kolmogorov, acts on observables); $\K_\tau=e^{L^\dagger\tau}$, $\P_\tau=e^{L\tau}$</td><td>—</td></tr>
+<tr><td>Singular pairs (paper's Eq. 8)</td><td>$\K_\tau u_i=\lambda_i v_i$, $\K^\dagger_\tau v_i=\lambda_i u_i$</td><td>$v_i$ lives at $t$ (predictive), $u_i$ at $t+\tau$ (retrospective)</td></tr>
+</table>
+<p class="remark">Naming trap in the paper: Section 2 calls the predictive functions $v_i$ "left singular functions"; Section 3 and Figs. 1–2
+write the whitened matrix as $[\mathbf u_1\mathbf u_2]\Lambda[\mathbf v_1\mathbf v_2]^\top$, making $\mathbf v_i$ a <em>right</em> singular vector.
+The operator and matrix conventions are transposes of each other. Track $u$ versus $v$, not left versus right.</p>
+
+<h2>Confidence tiers and references</h2>
+<p>Solutions mark claims that are not textbook-settled with <span class="tier">High</span>, <span class="tier">Medium</span> or
+<span class="tier">Speculative</span>. Unmarked derivations are standard. Standing references: Lasota &amp; Mackey, <em>Chaos, Fractals and Noise</em> (1994), Ch. 3–4 (transfer operators);
+Pavliotis, <em>Stochastic Processes and Applications</em> (2014), Ch. 3–4 (generators, OU); Froyland, Santitissadeekorn &amp; Monahan, <em>Chaos</em> 20 (2010) and Froyland, <em>Physica D</em> 250 (2013) (coherent sets);
+Koltai, Wu, Noé &amp; Schütte, <em>Computation</em> 6 (2018) (singular functions from data); von Luxburg, <em>Stat. Comput.</em> 17 (2007) (spectral clustering).</p>
+
+<h2>Code</h2>
+<p>Numerical parts have NumPy/SciPy scripts in <code>code/</code>; the solutions quote their output. They are short enough to port to JAX in a few minutes.</p>

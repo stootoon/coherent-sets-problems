@@ -4,6 +4,7 @@ Run `python3 build.py` after editing anything in src/, then commit the generated
 import pathlib, re
 
 ROOT = pathlib.Path(__file__).parent
+ACTIVE = ' class="active"'
 PAGES = [  # (fragment, output, nav label)
     ("index.md.html",  "index.html",  "Overview"),
     ("block0.html",    "block0.html", "0 · Transfer operators"),
@@ -62,7 +63,7 @@ def main():
         m = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.S)
         title = re.sub(r"<[^>]+>", "", m.group(1)).strip() if m else out
         nav = " ".join(
-            f'<a href="{o}"{" class=\"active\"" if o == out else ""}>{label}</a>' for _, o, label in PAGES
+            f'<a href="{o}"{ACTIVE if o == out else ""}>{label}</a>' for _, o, label in PAGES
         )
         (ROOT / out).write_text(TEMPLATE.format(title=title, nav=nav, body=body), encoding="utf-8")
         print("wrote", out)

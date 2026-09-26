@@ -17,7 +17,18 @@ The bracket is the drift; the second term has zero mean.</p>
 <details class="solution"><summary>Solution</summary>
 <p>For constant $D$, $\tfrac12\tr(D\nabla^2g)=\tfrac12\nabla\!\cdot(D\nabla g)$, so write the drift as $L^\dagger g$. Integrating (a) from $0$ to $t$ and conditioning on $X_0=x$, the stochastic integral has zero conditional expectation (it is a martingale), giving Dynkin's formula
 $$\E[g_0(X_t)\mid X_0=x]=g_0(x)+\E\Big[\int_0^t(L^\dagger g_0)(X_s)\,ds\,\Big|\,X_0=x\Big].$$
-Differentiating in $t$: $\partial_t\,\K_tg_0(x)=\E[(L^\dagger g_0)(X_t)\mid X_0=x]=\K_t(L^\dagger g_0)(x)$. To turn this into a PDE in $x$ for $g(x,t)=\K_tg_0(x)$ one needs $\K_tL^\dagger=L^\dagger\K_t$, i.e. that the generator commutes with the semigroup — which holds because $\K_t=e^{L^\dagger t}$, and that in turn rests on the semigroup property $\K_{s}\K_t=\K_{s+t}$ of Problem 1(d), i.e. on the Markov property. Then $\partial_tg=L^\dagger g$, $g(x,0)=g_0(x)$: the paper's Eq. (12), and $\K_\tau=e^{L^\dagger\tau}$ is Eq. (13). (Øksendal, <em>Stochastic Differential Equations</em>, Thm 8.1.1; Pavliotis 2014, §2.5.)</p>
+Differentiating in $t$: $\partial_t\,\K_tg_0(x)=\E[(L^\dagger g_0)(X_t)\mid X_0=x]=\K_t(L^\dagger g_0)(x)$.</p>
+<p><em>Why this is not yet a PDE.</em> Read the right-hand side as an instruction: apply $L^\dagger$ to the <em>initial</em> function $g_0$, then propagate the result for time $t$. It never mentions the unknown $g(\cdot,t)=\K_tg_0$. A PDE in $x$ needs the operator acting on the current function, $\partial_tg=L^\dagger(\K_tg_0)=L^\dagger g(\cdot,t)$, so one must show $\K_tL^\dagger g_0=L^\dagger\K_tg_0$. Operators do not commute for free, and one cannot argue "because $\K_t=e^{L^\dagger t}$": that formula is the paper's Eq. (13), the thing being derived.</p>
+<p><em>Why they commute.</em> The Markov property gives the semigroup law $\K_{t+h}=\K_t\K_h=\K_h\K_t$ (Chapman–Kolmogorov, Problem 1(d)). Dynkin's formula at small time says that for smooth $f$
+$$\lim_{h\to0}\frac{\K_hf-f}{h}=L^\dagger f .$$
+Now compute $\partial_t\K_tg_0$ by writing $\K_{t+h}$ in the two orders:
+$$\frac{\K_{t+h}g_0-\K_tg_0}{h}=\K_t\Big(\frac{\K_h-I}{h}\,g_0\Big)\;\to\;\K_tL^\dagger g_0,
+\qquad
+\frac{\K_{t+h}g_0-\K_tg_0}{h}=\frac{\K_h-I}{h}\big(\K_tg_0\big)\;\to\;L^\dagger(\K_tg_0).$$
+The left-hand sides are the same expression, so the limits agree: $\K_tL^\dagger g_0=L^\dagger\K_tg_0$. The first limit is what Dynkin gave; the second is the backward Kolmogorov equation $\partial_tg=L^\dagger g$, $g(x,0)=g_0(x)$, the paper's Eq. (12). (The second limit also needs $\K_tg_0$ smooth enough for $L^\dagger$ to act on it; for OU with non-degenerate $D$ this holds.) The solution operator of that PDE is, by definition, $e^{L^\dagger t}$, which is Eq. (13). The only input beyond Itô was the semigroup law, i.e. the Markov property.</p>
+<p><em>A route that avoids the commutation step.</em> Fix the horizon $t$ and set $M_s=g(X_s,\,t-s)$ for $0\le s\le t$. By the Markov property and time-homogeneity, $M_s=\E[g_0(X_t)\mid\mathcal F_s]$, which is a martingale (tower property). Itô applied to $g(X_s,t-s)$ in both arguments gives
+$$dM_s=\big(-\partial_tg+L^\dagger g\big)(X_s,t-s)\,ds+\nabla g^\top\sqrt D\,dW_s .$$
+A martingale has no $ds$ term, and $X_s$ can sit anywhere, so $\partial_tg=L^\dagger g$ pointwise. Here the Markov property is used exactly once, in the identity $\E[g_0(X_t)\mid\mathcal F_s]=g(X_s,t-s)$. (Øksendal, <em>Stochastic Differential Equations</em>, Thm 8.1.1; Pavliotis 2014, §2.5.)</p>
 </details></div>
 
 <div class="part"><p><span class="q">(c)</span> Show by integration by parts that $L^\dagger$ is the Lebesgue adjoint of the Fokker–Planck operator $L$, assuming all boundary terms vanish. Note which term changes sign and which does not.</p>

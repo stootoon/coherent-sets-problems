@@ -20,7 +20,7 @@ Taking expectations, $\dot\Sigma=A\Sigma+\Sigma A^\top+D$. Stationarity $\dot\Si
 <p>Interpretation: the stationary state is $x_t=\int_{-\infty}^te^{A(t-s)}\sqrt D\,dW_s$, a sum of all past noise kicks, each propagated forward and shrunk by $e^{A(t-s)}$; the covariance adds up their (independent) contributions. Discrete-time analogue: the Kalman-filter prediction covariance fixed point $\Sigma=\Phi\Sigma\Phi^\top+Q$ with $\Phi=e^{A\Delta t}$. Uniqueness: the Sylvester equation $A\Sigma+\Sigma A^\top=-D$ has a unique solution iff no two eigenvalues of $A$ sum to zero (Bhatia &amp; Rosenthal 1997), which stable $A$ satisfies automatically.</p>
 </details></div>
 
-<div class="part"><p><span class="q">(c)</span> Show that $\rho_0(x)\propto\exp(-\tfrac12x^\top\Sigma^{-1}x)$ satisfies $L\rho_0=0$ when $\Sigma$ solves Eq. (15).</p>
+<div class="part"><p><span class="q">(c)</span> Show that $\rho_0(x)\propto\exp(-\tfrac12x^\top\Sigma^{-1}x)$ satisfies $L\rho_0=0$ when $\Sigma$ solves Eq. (15). Here $L$ is the Fokker–Planck operator of Problem 6 with OU drift, $Lp=-\nabla\!\cdot(Ax\,p)+\tfrac12\nabla\!\cdot(D\nabla p)$ (the paper's Eq. 11), which generates the evolution of densities, $\partial_t\rho=L\rho$; so $L\rho_0=0$ says $\rho_0$ is stationary, equivalently $\P_\tau\rho_0=\rho_0$ for all $\tau$.</p>
 <details class="solution"><summary>Solution</summary>
 <p>$\nabla\rho_0=-\Sigma^{-1}x\,\rho_0$. Using the expansion from Problem 6(d),
 $$L\rho_0=-(\tr A)\rho_0-(Ax)\cdot\nabla\rho_0+\tfrac12\nabla\!\cdot(D\nabla\rho_0)

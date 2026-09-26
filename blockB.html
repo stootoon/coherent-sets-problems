@@ -53,9 +53,19 @@ A martingale has no $ds$ term, and $X_s$ can sit anywhere, so $\partial_tg=L^\da
 
 <div class="part"><p><span class="q">(c)</span> Show by integration by parts that $L^\dagger$ is the Lebesgue adjoint of the Fokker–Planck operator $L$, assuming all boundary terms vanish. Note which term changes sign and which does not.</p>
 <details class="solution"><summary>Solution</summary>
-<p>Drift term: $\int g\,[-\nabla\!\cdot(bp)]\,dx=\int(\nabla g)\cdot bp\,dx=\int(b\cdot\nabla g)\,p\,dx$ (one integration by parts, boundary term dropped). Diffusion term: $\int g\,\tfrac12\nabla\!\cdot(D\nabla p)\,dx=-\tfrac12\int\nabla g\cdot D\nabla p\,dx=\tfrac12\int\nabla\!\cdot(D\nabla g)\,p\,dx$ (two integrations by parts; $D$ symmetric). Summing,
+<p><em>The one rule.</em> For a scalar $\phi$ and a vector field $F$ on $\R^n$, the product rule is $\nabla\!\cdot(\phi F)=\nabla\phi\cdot F+\phi\,\nabla\!\cdot F$. Integrating over $\R^n$, the left side is a total divergence and equals the flux of $\phi F$ through a sphere of radius $R\to\infty$ (the boundary term). Assuming it vanishes,
+$$\int\phi\,(\nabla\!\cdot F)\,dx=-\int\nabla\phi\cdot F\,dx :$$
+move the divergence off $F$ onto $\phi$ as a gradient, at the cost of one minus sign. In one dimension this is $\int\phi F'=-\int\phi'F$.</p>
+<p><em>Drift term (one application).</em> Take $\phi=g$, $F=bp$:
+$$\int g\,\big[-\nabla\!\cdot(bp)\big]\,dx=+\int\nabla g\cdot(bp)\,dx=\int(b\cdot\nabla g)\,p\,dx .$$
+The minus sign built into $L$ cancels the one from the rule; the last step regroups scalars, $\nabla g\cdot(bp)=(b\cdot\nabla g)\,p$.</p>
+<p><em>Diffusion term (two applications).</em> First $\phi=g$, $F=D\nabla p$: $\int g\,\nabla\!\cdot(D\nabla p)\,dx=-\int\nabla g\cdot D\nabla p\,dx$. Use symmetry of $D$ to move it onto the other gradient: $\nabla g\cdot D\nabla p=\sum_{ij}\partial_ig\,D_{ij}\,\partial_jp=(D\nabla g)\cdot\nabla p$. Then $\phi=p$, $F=D\nabla g$:
+$$-\int(D\nabla g)\cdot\nabla p\,dx=+\int p\,\nabla\!\cdot(D\nabla g)\,dx .$$
+Two minus signs, net plus. Multiplying by $\tfrac12$ and adding the drift term,
 $$\int g\,(Lp)\,dx=\int(L^\dagger g)\,p\,dx,\qquad L^\dagger g=b\cdot\nabla g+\tfrac12\nabla\!\cdot(D\nabla g).$$
-The first-order (advective) part picks up a minus sign under one integration by parts: it is <em>anti</em>-self-adjoint. The second-order (diffusive) part picks up two minus signs: it is self-adjoint. Irreversibility can therefore only enter through the drift; pure diffusion is always reversible. Problem 9 makes this quantitative for the OU process.</p>
+Since $D$ is constant, $\nabla\!\cdot(D\nabla g)=\sum_{ij}D_{ij}\partial_i\partial_jg=\tr(D\nabla^2g)$, matching the drift in (a).</p>
+<p><em>Boundary terms.</em> Each dropped term is $\lim_{R\to\infty}\oint_{|x|=R}\phi F\cdot n\,dS$. Every $F$ above contains $p$ or $\nabla p$, and $p$ is a density (Gaussian for OU), so these vanish provided $g$ and its derivatives grow at most polynomially, which covers the linear observables of Section 3.</p>
+<p><em>Signs.</em> The first-order (advective) part flips sign under the adjoint: one integration by parts, one minus. (It is anti-self-adjoint only when $\nabla\!\cdot b=0$; in general $(b\cdot\nabla)^\dagger g=-b\cdot\nabla g-(\nabla\!\cdot b)g$, and for OU $\nabla\!\cdot(Ax)=\tr A\ne0$. The extra zeroth-order term is what makes $L$ act on densities and $L^\dagger$ on observables.) The second-order (diffusive) part picks up two minus signs and keeps its sign: it is self-adjoint. Irreversibility can therefore only enter through the drift; pure diffusion is always reversible. Problem 9 makes this quantitative for the OU process.</p>
 </details></div>
 
 <div class="part"><p><span class="q">(d)</span> Specialise to the OU drift $b(x)=Ax$ and recover the paper's Eqs. (11)–(13).</p>

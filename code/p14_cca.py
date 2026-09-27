@@ -1,4 +1,4 @@
-"""Problem 13: past-future CCA on simulated irreversible OU data recovers Eq. (18)."""
+"""Problem 14: past-future CCA on simulated irreversible OU data recovers Eq. (18)."""
 import numpy as np
 from scipy.linalg import expm, solve_sylvester
 np.set_printoptions(precision=4, suppress=True)

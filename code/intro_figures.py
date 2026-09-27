@@ -44,12 +44,19 @@ def saddle():
     W = np.linalg.inv(V)                                          # rows: left eigenvectors (stable coord, unstable coord)
     ws, wu = W[0], W[1]
     dt, tau, D, m = .01, 1.0, .06, 2500
-    x0 = 0.9*rng.standard_normal((m, 2)); x = x0.copy()
-    for _ in range(int(tau/dt)): x = x + x @ A.T * dt + np.sqrt(D*dt)*rng.standard_normal((m, 2))
+    # one set of PRESENT states, each with a known past (t - tau) and future (t + tau).
+    # Sample the past cloud pre-stretched so that the present cloud is roughly isotropic.
+    z = 0.9*rng.standard_normal((m, 2))
+    x_past = z @ (V @ np.diag([np.exp(tau), np.exp(-tau)])).T
+    def evolve(x):
+        x = x.copy()
+        for _ in range(int(tau/dt)): x = x + x @ A.T * dt + np.sqrt(D*dt)*rng.standard_normal((m, 2))
+        return x
+    x_now = evolve(x_past); x_future = evolve(x_now)
     fig, ax = plt.subplots(1, 2, figsize=(8.4, 4.0))
     g = np.linspace(-3, 3, 24); X, Y = np.meshgrid(g, g); U_, V_ = A[0,0]*X + A[0,1]*Y, A[1,0]*X + A[1,1]*Y
-    for a, pts, col, ttl in [(ax[0], x0, x @ wu > 0, "predictive set: coloured by the FUTURE\n(sign of unstable coordinate at $t+\\tau$)"),
-                             (ax[1], x,  x0 @ ws > 0, "retrospective set: coloured by the PAST\n(sign of stable coordinate at $t-\\tau$)")]:
+    for a, pts, col, ttl in [(ax[0], x_now, x_future @ wu > 0, "predictive set: same points, coloured by the FUTURE\n(sign of unstable coordinate at $t+\\tau$)"),
+                             (ax[1], x_now, x_past @ ws > 0,   "retrospective set: same points, coloured by the PAST\n(sign of stable coordinate at $t-\\tau$)")]:
         a.streamplot(X, Y, U_, V_, color="#d8d3ca", density=.55, linewidth=.6, arrowsize=.7)
         a.scatter(pts[col, 0], pts[col, 1], s=3, color=RED, alpha=.55, lw=0)
         a.scatter(pts[~col, 0], pts[~col, 1], s=3, color=BLUE, alpha=.55, lw=0)

@@ -30,4 +30,4 @@ to regenerate the top-level `*.html` files, and commit both. Solutions are `<det
 
 ## Code
 
-`code/` holds the NumPy/SciPy scripts behind the numeric problems (4, 11, 12, 13, 14). Run any of them with `python3 code/<name>.py`.
+`code/` holds the NumPy/SciPy scripts behind the numeric problems (4, 11, 12, 13, 14, 15). Run any of them with `python3 code/<name>.py`.

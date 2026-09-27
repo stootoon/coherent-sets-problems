@@ -50,3 +50,9 @@ mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; margin: .6
 footer { max-width: 52rem; margin: 0 auto; padding: 1rem 1.2rem 2rem; color: var(--muted); font-size: .85rem;
   border-top: 1px solid var(--rule); }
 ol.toc { padding-left: 1.3rem; } ol.toc li { margin: .25rem 0; }
+figure.fig { margin: 1.1rem 0; }
+figure.fig img { display: block; width: 100%; background: #fbfaf7; border-radius: .4rem; padding: .4rem; box-sizing: border-box; }
+figure.fig.row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: flex-start; }
+figure.fig.row img { width: auto; height: 14rem; flex: 0 1 auto; min-width: 0; object-fit: contain; }
+figure.fig.row figcaption { flex-basis: 100%; }
+figure.fig figcaption { font-size: .85rem; color: var(--muted); margin-top: .4rem; line-height: 1.45; }

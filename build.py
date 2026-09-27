@@ -7,6 +7,7 @@ ROOT = pathlib.Path(__file__).parent
 ACTIVE = ' class="active"'
 PAGES = [  # (fragment, output, nav label)
     ("index.md.html",  "index.html",  "Overview"),
+    ("blockI.html",    "blockI.html", "I · Why coherent sets"),
     ("block0.html",    "block0.html", "0 · Transfer operators"),
     ("blockA.html",    "blockA.html", "A · Finite chains"),
     ("blockB.html",    "blockB.html", "B · Generators"),

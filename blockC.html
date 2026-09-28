@@ -117,6 +117,9 @@ $$e^{A^\top\tau}\Sigma^{-1}e^{A\tau}\Sigma\;v=\lambda^2v,$$
 the first equation of (18). For $B_\tau f(r)=\E\big[\E[f(X_{t+\tau})\mid X_t]\mid X_{t+\tau}=r\big]$: inner mean $e^{A\tau}X_t$, outer $e^{A\tau}\Sigma e^{A^\top\tau}\Sigma^{-1}r=:Nr$, so $B_\tau(u^\top x)=u^\top Nx$ and $N^\top u=\lambda^2u$:
 $$\Sigma^{-1}e^{A\tau}\Sigma e^{A^\top\tau}\;u=\lambda^2u,$$
 the second equation of (18). The covariance of $q$ never entered: it would only appear when $F_\tau$ acts on quadratic and higher observables, which is Problem 11.</p>
+<p><em>The second equation by direct integration.</em> With the forward Gaussian kernel $p_\tau(y\mid x)$, whose mean is $e^{A\tau}x$ (part (a)), and the backward kernel $\tilde p_\tau(x\mid r)$, whose mean is $\Sigma e^{A^\top\tau}\Sigma^{-1}r$ (part (b)),
+$$B_\tau(u^\top x)(r)=\int\tilde p_\tau(x\mid r)\Big[\int p_\tau(y\mid x)\,u^\top y\,dy\Big]dx=\int\tilde p_\tau(x\mid r)\,u^\top e^{A\tau}x\,dx=u^\top e^{A\tau}\,\Sigma e^{A^\top\tau}\Sigma^{-1}r=u^\top Nr .$$
+Second equality: the integral of a linear function against a probability density is the linear function of the density's mean (linearity of the integral). Third: the same rule for the outer kernel, after taking the constant row vector $u^\top e^{A\tau}$ outside the integral. The covariances of both kernels never enter because only linear functions are integrated, which is the integral form of the remark that only the means matter here.</p>
 </details></div>
 
 <div class="part"><p><span class="q">(d)</span> Substitute $v=\Sigma^{-1/2}w$ to get $\tilde M^\top\tilde M\,w=\lambda^2w$ with $\tilde M=\Sigma^{-1/2}e^{A\tau}\Sigma^{1/2}$. Identify $\lambda_i$, and state precisely what "singular vector of the whitened transition matrix" means for $v_i$ and $u_i$. Show also that $\lambda_i\le1$ for stable $A$.</p>

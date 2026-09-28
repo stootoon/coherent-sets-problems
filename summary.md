@@ -56,10 +56,13 @@ those surfaces don't render inline `$…$` anyway — the scratch-page workflow 
 2. Block D Problems 13, 15, 16 added; 14 expanded; Introduction block with figures; Block A opening remark; build.py fixed for Python 3.9.
 3. **This conversation**: Block B duality remark + Q1; round-trips remark + Q2 (incl. type bookkeeping, kernel derivation, tower-trap); non-stationarity coda + Q3; Q1/Q2 split into per-sub-part foldouts; index.md.html Block B line and Block B lead updated; `.gitignore` added.
 
+4. **28 Sep 2026 (later)**: Block D prelude on learning vs approximation (see above). Then, at the user's request, every solution that used the tower property got a companion paragraph "By direct integration" (kernel integrals, Fubini, joint density = ρ₀(x)p_τ(y|x)): Block B Problem 6 martingale remark (Chapman–Kolmogorov), 7(d) adjoint check, Q2(i)–(iii) via the sibling kernel q_τ, Q2(vi) (why q_τ ≠ δ; forward∘forward composes, forward∘backward doesn't); Block C 10(c) second equation of (18) by integrating linear observables against the two Gaussian kernels; Block D Q1(i) step 1, 13(b), 15(e) (sibling identity as triple integral; law of total variance in integral form); 14(b)(i) reference reworded. The user wants this pattern kept: whenever a solution invokes the tower property, also give the direct-integration version.
+
 ## User preferences (important)
 
 - Solutions must **name the rule or definition at each equality** (memory `explicit-solution-steps`): the user gets stuck when a step silently invokes a definition; state a general rule once, then apply it; never cite a later result circularly.
 - One foldout (`details`) per sub-part; don't merge (i)(ii)(iii) into one Answer.
+- Whenever a solution uses the tower property, add a "By direct integration" version alongside it (kernel integrals; name Fubini and the joint-density factorisation).
 - Chat explanations first; fold into the set only when asked ("add it and push").
 - Math-heavy chat answers: render to `scratch-*.html` and give the localhost:8765 link (see workflow above).
 - Keep problem numbering stable; standalone questions (Q1, Q2, Q3 in Block B) avoid renumbering problems. When renumbering, update `src/index.md.html`, `README.md`, cross-references (`grep -n "Problem N"` across `src/`), and script names.

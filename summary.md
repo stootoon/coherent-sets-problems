@@ -9,9 +9,9 @@ Pughe-Sanford et al., *Neurons as Detectors of Coherent Sets in Sensory Dynamics
 The paper and supplement are checked in as `paper.pdf` and `supp.pdf`. The site is published via
 GitHub Pages from `main` (remote `github.com:stootoon/coherent-sets-problems`).
 
-The user (Sina) is reading the paper with the set. Their role in this conversation has been to ask
-conceptual and step-level questions; my role has been to explain, then fold the explanations into the
-set when asked. **They ask to commit and push explicitly** ("add it and push"); do not push unasked.
+The user (Sina) is reading the paper with the set. Their role has been to ask conceptual and
+step-level questions; my role has been to explain, then fold the explanations into the set when
+asked. **They ask to commit and push explicitly** ("add it and push"); do not push unasked.
 
 ## Repo layout and workflow
 
@@ -19,61 +19,64 @@ set when asked. **They ask to commit and push explicitly** ("add it and push"); 
 - `python3 build.py` regenerates the top-level pages (`index.html`, `blockI.html`, `block0.html`, `blockA.html` … `blockD.html`) from `src/` plus the template in `build.py`. Commit both `src/` and the generated files.
 - `style.css` — shared stylesheet (light/dark; `.setting`, `.goal`, `.part`, `.q`, `details.solution`, `.remark`, `.tier`, `figure.fig`, `figure.fig.row`).
 - `code/` — NumPy scripts behind numeric problems: `p04_finite_chain.py`, `p11_hermite.py`, `p12_saddle.py`, `p13_galerkin.py`, `p14_cca.py`, `p15_residual.py`, `p16_deadleaves.py`, `intro_figures.py` (makes `img/intro_*.svg`).
-- `img/` — `fig1a/b/c.png` (panels extracted from the paper's Fig. 1, credited in caption) and `intro_wells.svg`, `intro_saddle.svg`, `intro_neuron.svg`.
+- `img/` — `fig1a/b/c.png` (panels from the paper's Fig. 1, credited in caption) and `intro_wells.svg`, `intro_saddle.svg`, `intro_neuron.svg`.
 - `README.md` — publishing/editing instructions.
-- `prob4.ipynb` — untracked notebook of the user's; leave it alone.
+- `.gitignore` — ignores `scratch-*.html` (see below) and the user's `prob4.ipynb`.
 
 Markup conventions inside a block: `<h3 id="pN">Problem N — title</h3>`, a `<div class="setting">` with `<span class="label">Setting</span>`, `<p class="goal">`, then parts as
 `<div class="part"><p><span class="q">(a)</span> …</p><details class="solution"><summary>Solution</summary>…</details></div>`.
+Standalone question sets between/after problems use the same part markup with labels like `Q1(i)`, `Q2(iv)` and `<summary>Answer</summary>`. **One foldout per sub-part** — the user asked for (i)/(ii)/(iii) to be separate `details`, never mashed into one.
 Background prose goes in `<div class="remark">`. Confidence tags: `<span class="tier">High|Medium|Speculative</span>`.
 MathJax macros defined in `build.py`: `\E \R \tr \diag \ip{..} \K \P \X`. Use `\mathrm{He}_n` for Hermite polynomials (Problem 11 convention).
 
-Environment quirks: Python 3.9 (`build.py` was fixed for it: no backslashes inside f-strings), **no SciPy** (so `p14_cca.py` fails at import; every script I added is NumPy-only), matplotlib 3.9 available, `pdftotext`/`pdfimages`/`pdftoppm` available. To preview, run `python3 -m http.server 8765` and open `http://localhost:8765/blockI.html` in Chrome (file:// URLs are blocked for the browser tool). Commits end with `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`.
+Environment quirks: Python 3.9 (`build.py` fixed for it: no backslashes inside f-strings), **no SciPy** (`p14_cca.py` fails at import; all scripts I added are NumPy-only), matplotlib 3.9, `pdftotext`/`pdfimages`/`pdftoppm` available. Preview: `python3 -m http.server 8765` in the repo root, then `http://localhost:8765/blockB.html` etc. (file:// is blocked for the browser tool). Commits end with `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
+
+**Math rendering for chat answers**: the user cannot read raw TeX in the terminal. When an answer
+gets math-heavy, write it as a standalone MathJax HTML page `scratch-<topic>.html` in the repo root
+(untracked, gitignored), make sure the :8765 server is running, and give them the localhost link.
+Existing examples: `scratch-roundtrip.html` (the K†K derivation), `scratch-nonstationary.html`.
+Note: this CLI session cannot be continued in Claude desktop/web (per-surface session history), and
+those surfaces don't render inline `$…$` anyway — the scratch-page workflow is the solution.
 
 ## Structure of the set (current)
 
-- **Introduction** (`blockI.html`, nav "I · Why coherent sets") — conceptual, light on math. Sections: sensory stream as trajectory; invariant sets and their noisy replacement; why a neuron wants a membership index; prediction vs retrospection at a saddle; what a neuron actually does (lag vector → filter → threshold), incl. partial observation; road map. Questions Q1–Q9 with answers.
+- **Introduction** (`blockI.html`, nav "I · Why coherent sets") — conceptual. Questions Q1–Q9 with answers (trajectory view; invariant sets under noise; membership index; prediction vs retrospection at a saddle; lag vector → filter → threshold; partial observation/olfaction; road map).
 - **Block 0** — Koopman/Perron–Frobenius from scratch (Problems 0–1).
-- **Block A** — finite chains: weighted adjoints, reversibility, SVD, coherent sets, spectral clustering (Problems 2–5). Now opens with a remark box "The main result in three lines" (±1-indicator argument for why λ≈1 ⇔ coherent pair; law of total variance).
-- **Block B** — generators, contraction, ρ₀-adjoint (Problems 6–7).
-- **Block C** — OU: Lyapunov, reverse-time drift, Eq. (18), linear observables suffice, saddle asymptotics (Problems 8–12).
-- **Block D** — coherent sets from data:
-  - **13** Galerkin projection: derives Eq. (22) from the orthogonality condition; Eq. (23) via tower property; indicator features = Block A / Ulam's method; linear features exact for OU (K = e^{Aᵀτ}); coefficient-space adjoint and Eq. (24); numeric part (f) on {x,x²} vs {1,x,x²} for 1-D OU (projection error leaks the dropped constant into the x² coefficient).
-  - **14** Past–future CCA: background box (Hotelling, TICA/VAMP, predictive information, Gaussian IB, Lipshutz et al. circuit); (a) CCA via Lagrange multipliers, whitened SVD form, invariance; (b) whitened features are orthonormal, CCA matrix = compressed Koopman operator, reversibility ⇒ TICA (with the lag-vector caveat), Gaussian MI = −½Σlog(1−ρᵢ²); (c)–(e) the original numeric OU check.
-  - **15** "Is the approximation applied too early?": compression cannot inflate singular values (Courant–Fischer); compressed pair = two-sided restricted variational problem, VAMP-2 bound; hidden one-sided (Ritz for KK†) vs two-sided (CCA) choice worked on 1-D OU with feature x²; two-sided invariance ⇒ exact; residual needs ‖Kf‖², a sibling-trajectory quantity a single time series cannot supply (law of total variance). Script `p15_residual.py`.
-  - **16** Dead-leaves stimulus (paper's Fig. 2): exponential plateau lengths ⇒ only the level is linearly predictable (signal is second-order an OU); heavy-tailed lengths ⇒ second pair via age-dependent hazard; the transient (derivative) pair encodes mean reversion ("just stepped up → will be lower"), not "edge → flat"; whitening explains the low-pass look of the first filter; lag vectors of a reversible signal give Σ_τᵀ = J Σ_τ J (J = lag reversal), not symmetric Σ_τ, so future filters are lag-reversed past filters. Script `p16_deadleaves.py`.
+- **Block A** — finite chains (Problems 2–5). Opens with the remark "The main result in three lines" (±1-indicator argument; law of total variance).
+- **Block B** — generators, contraction, ρ₀-adjoint (Problems 6–7), **plus (added this conversation)**:
+  - Remark "In what sense are observables dual to densities?" (between Problems 6 and 7): three levels — the bilinear nondegenerate pairing ⟨f,ρ⟩=E_ρ[f] (duality really with signed measures); Banach asymmetry ((L¹)*=L∞ but not conversely; K is *the* adjoint of P, P is the pre-adjoint); the ρ₀-geometry collapse via the dictionary f ↔ fρ₀ (self-duality, 1 and ρ₀ merge into the trivial pair). Q1(i)–(iii), separate foldouts.
+  - Remark "The two round trips and the sibling trajectory" (after Problem 7): K between slices has no usable spectrum for non-reversible dynamics; K†K and KK† are self-adjoint round trips; SVD = their matched eigendecompositions; sibling trajectory = shares one state, independent noise; K†K interrogates the future about its past (u_i, retrospective), KK† the present about its future (v_i, predictive); 1−λ₁² = sibling disagreement; Bayes-flip phrasing caveat; type-bookkeeping paragraph (K's input slot = later slice, output = earlier; K†'s the reverse; the composite returns to f's own slice). Q2(i)–(vi), separate foldouts: (i) K†K1_B = sibling probability (cond. independence + tower); (ii) ⟨1_B,K†K1_B⟩ = two-sibling agreement, normalized = self-coherence; (iii) KK†1_A mirror; (iv) reversible ⇒ both round trips = K², u=v, metastable not transported; (v) kernel-composition derivation of the sibling kernel q_τ(y′|y) with sanity checks (symmetry = self-adjointness; K†K1=1); (vi) why the tower property does NOT collapse K†K to I (outer conditioning not coarser), deterministic ⇒ K unitary, noise creates the coherence hierarchy.
+  - **Coda — does any of this survive without stationarity?** (unnumbered h3 id="coda" at end of block): remark (skeleton survives — Froyland's non-autonomous origin; choose μ, ν=Pμ, K: L²(ν)→L²(μ); what dies: canonical ρ₀, semigroup → propagator cocycle, eigenvalues not well-typed, reversibility/TICA unstatable; statistical casualty = ergodicity; neuron ⇒ local stationarity, fast non-stationarity = partial observation in disguise, slow = adaptation reshaping filters; Problem 12 read as a fixed-weight-on-both-slices violation of ν=Pμ; hierarchy reversible ⊂ stationary ⊂ non-stationary). Q3(i)–(iv), separate foldouts: (i) contraction L²(ν)→L²(μ) with ν=Pμ replacing stationarity; (ii) why Kf=λf and K†=K fail typing, why SVD survives; (iii) why one realisation can't estimate C₀₀(t); remedies: ensembles / quasi-stationarity (τ_mix ≪ T_window ≪ T_drift) / cyclostationarity; 15(e) compounds; (iv) time-dependent OU: differential Lyapunov equation, linear observables suffice slice-wise, doubly-whitened propagator Σ_{t+τ}^{-1/2}Φ Σ_t^{1/2} = slice-specific CCA.
+- **Block C** — OU (Problems 8–12): 8 Lyapunov, 9 reverse-time OU, 10 Eq. (18) from the sibling kernel (its Setting already defines F_τ=KK†, B_τ=K†K with the sibling kernel — Block B Q2(v) cross-references it), 11 linear observables suffice, 12 saddle asymptotics (indefinite Σ, eigenvalues above 1, "closest to unity" only meaningful at short horizons).
+- **Block D** — coherent sets from data: 13 Galerkin (Eq. 22–24), 14 past–future CCA (background box; TICA/VAMP/Gaussian IB), 15 "approximation applied too early?" (compression can't inflate singular values; sibling-quantity residual obstruction), 16 dead-leaves stimulus.
 
-## Edits made in this conversation (all pushed)
+## Edits made across sessions (all pushed)
 
-1. 6(b): replaced circular "because K_t = e^{L†t}" with the generator-as-K_dt / semigroup argument; martingale route added.
-2. 6(c): integration by parts spelled out (single divergence-theorem rule, applied once/twice; boundary terms; fixed loose "anti-self-adjoint" claim — true only if ∇·b = 0).
-3. 7(d): unpacked the two silent steps (definition of P_τ applied to fρ₀; expectation against ρ₀ + taking-out-what-is-known + tower).
-4. 8(c): reminder of what L is.
-5. Block D Problems 13, 15, 16 added; Problem 14 expanded (old numeric parts became (c)–(e)); old p13_cca.py renamed p14_cca.py.
-6. Introduction block added with figures; saddle panel reworked so one shared set of present states is coloured by future and by past.
-7. Block A opening remark added.
-8. `build.py` fixed for Python 3.9; figure CSS added.
+1. 6(b) generator/semigroup argument; 6(c) integration by parts spelled out; 7(d) silent steps unpacked; 8(c) reminder of L.
+2. Block D Problems 13, 15, 16 added; 14 expanded; Introduction block with figures; Block A opening remark; build.py fixed for Python 3.9.
+3. **This conversation**: Block B duality remark + Q1; round-trips remark + Q2 (incl. type bookkeeping, kernel derivation, tower-trap); non-stationarity coda + Q3; Q1/Q2 split into per-sub-part foldouts; index.md.html Block B line and Block B lead updated; `.gitignore` added.
 
 ## User preferences (important)
 
-- Solutions were originally too "slick"; the user gets stuck when a step silently invokes a definition. **Name the rule or definition at each equality**, state a general rule once then apply it, never cite a later result circularly. (Saved in memory as `explicit-solution-steps`.)
-- Conceptual explanations in chat have been well received; when asked to "add it", fold them into the set as background boxes + problems/questions with click-to-reveal answers.
-- Keep problem numbering stable where possible; when renumbering, update `src/index.md.html`, `README.md`, cross-references (`grep -n "Problem N"` across `src/`), and script names.
-- Validate HTML tag balance after big edits (a small `html.parser` check was used), rebuild, then commit + push in one go when asked.
+- Solutions must **name the rule or definition at each equality** (memory `explicit-solution-steps`): the user gets stuck when a step silently invokes a definition; state a general rule once, then apply it; never cite a later result circularly.
+- One foldout (`details`) per sub-part; don't merge (i)(ii)(iii) into one Answer.
+- Chat explanations first; fold into the set only when asked ("add it and push").
+- Math-heavy chat answers: render to `scratch-*.html` and give the localhost:8765 link (see workflow above).
+- Keep problem numbering stable; standalone questions (Q1, Q2, Q3 in Block B) avoid renumbering problems. When renumbering, update `src/index.md.html`, `README.md`, cross-references (`grep -n "Problem N"` across `src/`), and script names.
+- Validate HTML tag balance after big edits (small `html.parser` check), rebuild, then commit + push in one go when asked.
 
-## Conceptual conclusions reached (useful context for further questions)
+## Conceptual conclusions reached (context for further questions)
 
-- The whole set is one idea at three levels of generality: coherent sets = subdominant singular vectors of the Koopman operator in the ρ₀ geometry; the adjoint is the spine (reversal = self-adjointness; SVD needs an adjoint; densities/observables dual).
-- Isometry (not mere similarity) is what makes whitening legitimate: inner-product objects (adjoint, SVD, orthogonality, contraction) survive only isometries.
-- Galerkin/EDMD: every layer of ignorance (unobserved state, finite lags, linear features) is a projection; Problem 15 says what you get (best representable pair) and that the neuron cannot check the residual.
-- Partial observation (olfaction): observability means one channel's lag vector can in principle see everything; in practice the "slice" is set by SNR and memory; the population carries the information but not the global coordinates without a pooling stage; prediction: filters cluster by predictive/retrospective type, not by glomerulus.
-- Applicability to real senses: the method needs only what is predictable at horizon τ within the representable class; short horizons ⇒ physics not semantics; weakest for intermittent non-Gaussian plume signals.
-- Population code: other neurons take further singular vectors (orthogonal partitions ordered by predictability); ON/OFF = two halves of one partition; for n-dim OU, n predictive + n retrospective units span the whitened state.
-- Paper naming trap: Section 2 calls predictive v_i "left"; matrix notation in Fig. 1/Eq. 18 makes v a right singular vector. Track u (future/retrospective) vs v (present/predictive).
+- One idea at three levels: coherent sets = subdominant singular vectors of K in the ρ₀ geometry; the adjoint is the spine.
+- Observables/densities duality: honest nondegenerate bilinear pairing; asymmetric at the Banach level (L¹ pre-dual of L∞); collapsed to self-duality in L²(ρ₀) via f ↔ fρ₀ — and the collapse is load-bearing (SVD needs adjoint needs inner product; ρ₀ is the weight making reversibility = self-adjointness and 1 ≡ ρ₀).
+- K†K / KK† round trips: the sibling-trajectory reading (share a state, independent noise); K alone has no good spectrum between slices; SVD = matched eigendecompositions of the round trips; 1−λ₁² = sibling disagreement; deterministic ⇒ unitary ⇒ no coherence hierarchy — noise creates it.
+- The tower-property trap: E[E[f(X_{t+τ})|X_t]|X_{t+τ}] does NOT collapse (outer conditioning not coarser); the sibling substitution is the legal move.
+- Non-stationarity: the two-slice, two-measure formalism (μ chosen, ν=Pμ) preserves the whole SVD/coherence/variational skeleton (it's Froyland's original setting; VAMP covers it); what dies is slice identification (ρ₀, semigroup, eigenvalues, reversibility) and single-trajectory estimation (needs ensembles / quasi-stationarity / cyclostationarity); for neurons: local stationarity on the learning timescale, adaptation = tracking μ_t, fast drift often = partial observation of a larger stationary system.
+- Isometry (not similarity) is what whitening legitimacy rests on; every layer of ignorance is a projection (13/15); paper naming trap: track u (future/retrospective) vs v (present/predictive), Section 2's "left" vs matrix-notation "right".
 
 ## Open threads / possible next steps
 
-- A full pass expanding *all* solutions in the "name every rule" style was offered; the user said "for now just fix that one" — do it only if asked.
-- Licence of the reproduced Fig. 1 panels was not verified (NeurIPS papers are usually CC BY 4.0).
+- Full pass expanding *all* solutions in "name every rule" style — offered, user said "for now just fix that one"; only if asked.
+- Licence of the reproduced Fig. 1 panels unverified (NeurIPS usually CC BY 4.0).
 - `p14_cca.py` needs SciPy (`expm`, `solve_sylvester`); could be rewritten NumPy-only.
-- Possible additions: a problem on hierarchical composition / nonlinear singular functions; a check of Problem 16's heavy-tail claim on an actual 1-D dead-leaves scan; a Block C remark connecting the saddle figure of the introduction to Problem 12.
+- Possible additions: hierarchical composition / nonlinear singular functions problem; empirical check of Problem 16's heavy-tail claim on a real 1-D dead-leaves scan; Block C remark connecting the intro's saddle figure to Problem 12; a numeric problem for the non-stationarity coda (time-dependent OU, slice-whitened CCA vs stationary CCA on a drifting process) — natural companion to Q3(iv); redoing Problem 12 in the two-measure formalism (Gaussian μ evolved, singular values back ≤ 1) to substantiate the coda's claim.
